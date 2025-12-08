@@ -6,7 +6,7 @@ fn main() {
 
     // Render
 
-    print!("P3\n {image_width} {image_height} \n255\n");
+    print!("P3\n{image_width} {image_height}\n255\n");
 
     for j in 0..image_height  {
         for i in 0..image_width {
@@ -18,7 +18,7 @@ fn main() {
             let ig = (255.999 * g) as i64;
             let ib = (255.999 * b) as i64;
 
-            print!("{ir} {ig} {ib}");
+            print!("{ir} {ig} {ib}\n");
         }
     }
 
