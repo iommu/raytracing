@@ -7,22 +7,22 @@ pub struct Ray {
 }
 
 impl Ray {
-    fn new(origin: &Vec3, dir: &Vec3) -> Ray {
+    pub fn new(origin: &Vec3, dir: &Vec3) -> Ray {
         Ray {
             origin: origin.clone(),
             dir: dir.clone(),
         }
     }
 
-    fn origin(&self) -> &Vec3 {
+    pub fn origin(&self) -> &Vec3 {
         &self.origin
     }
 
-    fn direction(&self) -> &Vec3 {
+    pub fn direction(&self) -> &Vec3 {
         &self.dir
     }
 
-    fn at(&self, t : f64) -> Vec3 {
+    pub fn at(&self, t : f64) -> Vec3 {
         &self.origin + &(&self.dir*t)
     }
 }
