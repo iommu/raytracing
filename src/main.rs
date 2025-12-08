@@ -18,7 +18,11 @@ fn write_color(color: &Color) {
 }
 
 fn ray_color(ray: &Ray) -> Color {
-    Color::new(0.0, 0.0, 0.0)
+    let unit_dir = ray.direction().unit_vector();
+    let a = 0.5 * (unit_dir.y() + 1.0);
+
+    &(&Color::new(1.0, 1.0, 1.0) * (1.0-a)) + //
+    &(&Color::new(0.5, 0.7, 1.0) * a)
 }
 
 fn main() {
@@ -33,7 +37,7 @@ fn main() {
     // Camera config
     let focal_length = 1.0;
     let viewport_height = 2.0;
-    let viewport_width = viewport_height * (image_width as f64 / image_width as f64);
+    let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
     let camera_center = Point3::new(0.0, 0.0, 0.0);
 
     // Calculate the vectors across the horizontal and down the vertical viewport edges
@@ -48,7 +52,7 @@ fn main() {
     let viewport_upper_left = &(&(&camera_center - &Vec3::new(0.0, 0.0, focal_length))
         - &(&viewport_u / 2.0))
         - &(&viewport_v / 2.0);
-    let pixel00_loc = &(&viewport_upper_left + 0.5) * &(&pixel_delta_u + &pixel_delta_v);
+    let pixel00_loc = &viewport_upper_left + &(&(&pixel_delta_u + &pixel_delta_v) * 0.5);
 
     // Render
     print!("P3\n{image_width} {image_height}\n255\n");
