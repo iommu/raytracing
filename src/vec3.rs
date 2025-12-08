@@ -1,5 +1,6 @@
 use std::ops;
 
+#[derive(Clone)]
 pub struct Vec3 {
     x: f64,
     y: f64,

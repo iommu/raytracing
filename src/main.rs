@@ -1,5 +1,8 @@
 mod vec3;
+mod ray;
 use vec3::Vec3;
+use ray::Ray;
+
 type Color = Vec3;
 
 fn write_color(color: &Color) {
