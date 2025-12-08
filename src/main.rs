@@ -17,13 +17,28 @@ fn write_color(color: &Color) {
     print!("{ir} {ig} {ib}\n");
 }
 
+
+fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> bool {
+    let oc = center - ray.origin();
+    let a = Vec3::dot(ray.direction(), ray.direction());
+    let b = Vec3::dot(ray.direction(), &oc) * -2.0;
+    let c = Vec3::dot(&oc, &oc) - radius * radius;
+    let discriminant = b * b - 4.0 * a * c;
+    //
+    discriminant >= 0.0
+}
+
 fn ray_color(ray: &Ray) -> Color {
+    if (hit_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, ray)) {
+        return Color::new(1.0, 0.0, 0.0);
+    }
+
     let unit_dir = ray.direction().unit_vector();
     let a = 0.5 * (unit_dir.y() + 1.0);
 
-    &(&Color::new(1.0, 1.0, 1.0) * (1.0-a)) + //
-    &(&Color::new(0.5, 0.7, 1.0) * a)
+    &(&Color::new(1.0, 1.0, 1.0) * (1.0 - a)) + &(&Color::new(0.5, 0.7, 1.0) * a)
 }
+
 
 fn main() {
     // Config
