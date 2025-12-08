@@ -19,15 +19,15 @@ fn write_color(color: &Color) {
 
 fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> f64 {
     let oc = center - ray.origin();
-    let a = Vec3::dot(ray.direction(), ray.direction());
-    let b = Vec3::dot(ray.direction(), &oc) * -2.0;
-    let c = Vec3::dot(&oc, &oc) - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
+    let a = ray.direction().len_squared();
+    let h = Vec3::dot(ray.direction(), &oc);
+    let c = oc.len_squared() - radius*radius;
+    let discriminant = h*h - a*c;
     //
     return if discriminant < 0.0 {
         -1.0
     } else {
-        (-b - discriminant.sqrt()) / (2.0 * a)
+        (h - discriminant.sqrt()) / a
     };
 }
 
