@@ -60,6 +60,17 @@ impl<'a, 'b> ops::Add<&'b Vec3> for &'a Vec3 {
     }
 }
 
+impl<'a> ops::Add<f64> for &'a Vec3 {
+    type Output = Vec3;
+    fn add(self, _rhs: f64) -> Vec3 {
+        Vec3 {
+            x: self.x + _rhs,
+            y: self.y + _rhs,
+            z: self.z + _rhs,
+        }
+    }
+}
+
 impl<'a, 'b> ops::Sub<&'b Vec3> for &'a Vec3 {
     type Output = Vec3;
     fn sub(self, _rhs: &'b Vec3) -> Vec3 {
@@ -71,7 +82,7 @@ impl<'a, 'b> ops::Sub<&'b Vec3> for &'a Vec3 {
     }
 }
 
-impl ops::Div<f64> for &Vec3 {
+impl<'a> ops::Div<f64> for &'a Vec3 {
     type Output = Vec3;
     fn div(self, _rhs: f64) -> Vec3 {
         Vec3 {
@@ -82,7 +93,7 @@ impl ops::Div<f64> for &Vec3 {
     }
 }
 
-impl ops::Mul<f64> for &Vec3 {
+impl<'a> ops::Mul<f64> for &'a Vec3 {
     type Output = Vec3;
     fn mul(self, _rhs: f64) -> Vec3 {
         Vec3 {
@@ -92,3 +103,18 @@ impl ops::Mul<f64> for &Vec3 {
         }
     }
 }
+
+impl<'a, 'b> ops::Mul<&'b Vec3> for &'a Vec3 {
+    type Output = Vec3;
+    fn mul(self, _rhs: &'b Vec3) -> Vec3 {
+        Vec3 {
+            x: self.x * _rhs.x,
+            y: self.y * _rhs.y,
+            z: self.z * _rhs.z,
+        }
+    }
+}
+
+// Aliases
+pub type Color = Vec3;
+pub type Point3 = Vec3;
