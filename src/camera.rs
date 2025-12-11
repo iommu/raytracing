@@ -3,13 +3,18 @@ use std::f64::INFINITY;
 use crate::hittable::{HitRecord, Hittable};
 use crate::interval::Interval;
 use crate::ray::Ray;
-use crate::utils::random_double;
+use crate::utils::{linear_to_gamma, random_double};
 use crate::vec3::{Color, Point3, Vec3};
 
 fn write_color(color: &Color) {
-    let r = color.x();
-    let g = color.y();
-    let b = color.z();
+    let mut r = color.x();
+    let mut g = color.y();
+    let mut b = color.z();
+
+    // Apply a linear to gamma transform for gamma 2
+    r = linear_to_gamma(r);
+    g = linear_to_gamma(g);
+    b = linear_to_gamma(b);
 
     // Translate the [0,1] component values to the byte range [0,255]
     let intensity = Interval::new(0.0, 0.999);
@@ -126,7 +131,7 @@ impl Camera {
 
         if world.hit(ray, Interval::new(0.001, INFINITY), &mut rec) {
             let direction = &rec.normal + &Vec3::random_unit_vector();
-            return &Self::ray_color(&Ray::new(&rec.p, &direction), depth - 1, world) * 0.5;
+            return &Self::ray_color(&Ray::new(&rec.p, &direction), depth - 1, world) * 0.3;
         }
 
         let unit_dir = ray.direction().unit_vector();
