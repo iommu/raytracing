@@ -53,14 +53,16 @@ impl HittableList {
     pub fn add(&mut self, object : Box<dyn Hittable>) {
         self.objects.push(object);
     }
+}
 
-    pub fn hit(&self, ray : &Ray, ray_tmin : f64, ray_tmax : f64, rec : &mut HitRecord) -> bool {
+impl Hittable for HittableList {
+     fn hit(&self, ray : &Ray, ray_tmin : f64, ray_tmax : f64, rec : &mut HitRecord) -> bool {
         let mut temp_rec = HitRecord::new();
         let mut hit_anything = false;
         let mut closest_so_far = ray_tmax;
 
         for object in &self.objects {
-            if (object.hit(ray, ray_tmin, ray_tmax, &mut temp_rec)) {
+            if (object.hit(ray, ray_tmin, closest_so_far, &mut temp_rec)) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
                 temp_rec.clone_into(rec);
