@@ -1,5 +1,7 @@
 use std::ops;
 
+use crate::utils::{random_double, random_double_range};
+
 #[derive(Debug, Clone)]
 pub struct Vec3 {
     x: f64,
@@ -9,11 +11,50 @@ pub struct Vec3 {
 
 impl Vec3 {
     pub fn default() -> Vec3 {
-        Vec3 { x: 0.0, y: 0.0, z: 0.0 }
+        Vec3 {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }
     }
 
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
         Vec3 { x: x, y: y, z: z }
+    }
+
+    pub fn random() -> Vec3 {
+        Vec3 {
+            x: random_double(),
+            y: random_double(),
+            z: random_double(),
+        }
+    }
+
+    pub fn random_from_range(min: f64, max: f64) -> Vec3 {
+        Vec3 {
+            x: random_double_range(min, max),
+            y: random_double_range(min, max),
+            z: random_double_range(min, max),
+        }
+    }
+
+    pub fn random_unit_vector() -> Vec3 {
+        loop {
+            let point = Vec3::random_from_range(-1.0, 1.0);
+            let len_s_point = point.len_squared();
+            if 1e-160 < len_s_point && len_s_point <= 1.0 {
+                return &point / len_s_point;
+            }
+        }
+    }
+
+    pub fn random_on_hemisphere(&self) -> Vec3 {
+        let on_unit_sphere = Self::random_unit_vector();
+        if Vec3::dot(&on_unit_sphere, self) > 0.0 {
+            on_unit_sphere
+        } else {
+            &on_unit_sphere * -1.0
+        }
     }
 
     pub fn x(&self) -> f64 {
