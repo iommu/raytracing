@@ -1,6 +1,7 @@
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
+#[derive(Debug, Clone)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
@@ -33,4 +34,39 @@ impl HitRecord {
 
 pub trait Hittable {
     fn hit(&self, ray: &Ray, ray_tmin: f64, ray_tmax: f64, rec: &mut HitRecord) -> bool;
+}
+
+
+pub struct HittableList {
+    objects : Vec<Box<dyn Hittable>>,
+}
+
+impl HittableList {
+    pub fn new() -> HittableList {
+        HittableList { objects: Vec::new() }
+    }
+
+    pub fn clear(&mut self) {
+        self.objects.clear();
+    }
+
+    pub fn add(&mut self, object : Box<dyn Hittable>) {
+        self.objects.push(object);
+    }
+
+    pub fn hit(&self, ray : &Ray, ray_tmin : f64, ray_tmax : f64, rec : &mut HitRecord) -> bool {
+        let mut temp_rec = HitRecord::new();
+        let mut hit_anything = false;
+        let mut closest_so_far = ray_tmax;
+
+        for object in &self.objects {
+            if (object.hit(ray, ray_tmin, ray_tmax, &mut temp_rec)) {
+                hit_anything = true;
+                closest_so_far = temp_rec.t;
+                temp_rec.clone_into(rec);
+            }
+        }
+
+        hit_anything
+    }
 }
