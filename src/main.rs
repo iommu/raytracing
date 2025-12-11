@@ -1,10 +1,12 @@
 mod hittable;
+mod interval;
 mod ray;
 mod sphere;
 mod vec3;
 
 use std::f64::INFINITY;
 
+use interval::Interval;
 use ray::Ray;
 use sphere::Sphere;
 use vec3::{Color, Point3, Vec3};
@@ -41,10 +43,10 @@ fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> f64 {
     };
 }
 
-fn ray_color<T: Hittable>(ray: &Ray, world : &T) -> Color {
+fn ray_color<T: Hittable>(ray: &Ray, world: &T) -> Color {
     let mut rec = HitRecord::new();
-    if world.hit(ray, 0.0, INFINITY, &mut rec) {
-        return &(&rec.normal + &Color::new(1.0, 1.0, 1.0))* 0.5;
+    if world.hit(ray, Interval::new(0.0, INFINITY), &mut rec) {
+        return &(&rec.normal + &Color::new(1.0, 1.0, 1.0)) * 0.5;
     }
 
     let unit_dir = ray.direction().unit_vector();
