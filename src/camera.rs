@@ -89,7 +89,7 @@ impl Camera {
             eprint!("Scanlines remaining: {}    \r", (self.image_height-j));
             for i in 0..self.image_width {
                 let mut pixel_color = Color::default();
-                for sample in 0..self.samples_per_pixel {
+                for _ in 0..self.samples_per_pixel {
                     let ray = self.get_ray(i, j);
                     pixel_color += Self::ray_color(&ray, self.max_depth, world);
                 }

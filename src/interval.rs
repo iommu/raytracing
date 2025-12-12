@@ -7,6 +7,7 @@ pub struct Interval {
 }
 
 impl Interval {
+    #[allow(dead_code)]
     pub fn empty() -> Interval {
         Interval {
             min : INFINITY,
@@ -14,6 +15,7 @@ impl Interval {
         }
     }
 
+    #[allow(dead_code)]
     pub fn universe() -> Interval {
         Interval {
             min : -INFINITY,
@@ -21,10 +23,12 @@ impl Interval {
         }
     }
 
+    #[allow(dead_code)]
     pub fn default() -> Interval {
         Self::empty()
     }
 
+    #[allow(dead_code)]
     pub fn new(min : f64, max : f64) -> Interval {
         Interval {
             min : min,
@@ -32,18 +36,22 @@ impl Interval {
         }
     }
 
+    #[allow(dead_code)]
     pub fn size(&self) -> f64 {
         self.min - self.max
     }
 
+    #[allow(dead_code)]
     pub fn contains(&self, x : f64) -> bool {
         (self.min <= x) && (x <= self.max)
     }
 
+    #[allow(dead_code)]
     pub fn surrounds(&self, x : f64) -> bool {
         (self.min < x) && (x < self.max)
     }
 
+    #[allow(dead_code)]
     pub fn clamp(&self, x : f64) -> f64 {
         if x < self.min {
             self.min

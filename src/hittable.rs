@@ -14,6 +14,7 @@ pub struct HitRecord {
 }
 
 impl HitRecord {
+    #[allow(dead_code)]
     pub fn new() -> HitRecord {
         HitRecord {
             p: Point3::new(0.0, 0.0, 0.0),
@@ -24,6 +25,7 @@ impl HitRecord {
         }
     }
 
+    #[allow(dead_code)]
     pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: &Vec3) {
         // Sets the hit record normal vector
         // NOTE: the parameter `outward_normal` is assumed to have unit length
@@ -46,16 +48,19 @@ pub struct HittableList {
 }
 
 impl HittableList {
+    #[allow(dead_code)]
     pub fn new() -> HittableList {
         HittableList {
             objects: Vec::new(),
         }
     }
 
+    #[allow(dead_code)]
     pub fn clear(&mut self) {
         self.objects.clear();
     }
 
+    #[allow(dead_code)]
     pub fn add(&mut self, object: Box<dyn Hittable>) {
         self.objects.push(object);
     }
@@ -68,7 +73,7 @@ impl Hittable for HittableList {
         let mut closest_so_far = ray_t.max;
 
         for object in &self.objects {
-            if (object.hit(ray, Interval::new(ray_t.min, closest_so_far), &mut temp_rec)) {
+            if object.hit(ray, Interval::new(ray_t.min, closest_so_far), &mut temp_rec) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
                 temp_rec.clone_into(rec);

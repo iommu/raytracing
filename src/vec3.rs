@@ -1,4 +1,4 @@
-use std::{cmp::min, ops};
+use std::ops;
 
 use crate::utils::{random_double, random_double_range};
 
@@ -10,6 +10,7 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
+    #[allow(dead_code)]
     pub fn default() -> Vec3 {
         Vec3 {
             x: 0.0,
@@ -18,10 +19,12 @@ impl Vec3 {
         }
     }
 
+    #[allow(dead_code)]
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
         Vec3 { x: x, y: y, z: z }
     }
 
+    #[allow(dead_code)]
     pub fn random() -> Vec3 {
         Vec3 {
             x: random_double(),
@@ -30,6 +33,7 @@ impl Vec3 {
         }
     }
 
+    #[allow(dead_code)]
     pub fn random_from_range(min: f64, max: f64) -> Vec3 {
         Vec3 {
             x: random_double_range(min, max),
@@ -38,6 +42,7 @@ impl Vec3 {
         }
     }
 
+    #[allow(dead_code)]
     pub fn random_unit_vector() -> Vec3 {
         loop {
             let point = Vec3::random_from_range(-1.0, 1.0);
@@ -48,6 +53,7 @@ impl Vec3 {
         }
     }
 
+    #[allow(dead_code)]
     pub fn random_on_hemisphere(&self) -> Vec3 {
         let on_unit_sphere = Self::random_unit_vector();
         if Vec3::dot(&on_unit_sphere, self) > 0.0 {
@@ -57,6 +63,7 @@ impl Vec3 {
         }
     }
 
+    #[allow(dead_code)]
     pub fn random_in_unit_disk() -> Vec3 {
         loop {
             let p = Vec3::new(
@@ -70,10 +77,12 @@ impl Vec3 {
         }
     }
 
+    #[allow(dead_code)]
     pub fn reflect(&self, n: &Vec3) -> Vec3 {
         self - &(n * (Vec3::dot(self, n) * 2.0))
     }
 
+    #[allow(dead_code)]
     pub fn refract(&self, n: &Vec3, etai_over_etat: f64) -> Vec3 {
         let cos_theta = f64::min((self * -1.0).dot(n), 1.0);
         let ray_out_perp = &(self + &(n * cos_theta)) * etai_over_etat;
@@ -81,30 +90,37 @@ impl Vec3 {
         &ray_out_perp + &ray_out_para
     }
 
+    #[allow(dead_code)]
     pub fn x(&self) -> f64 {
         self.x
     }
 
+    #[allow(dead_code)]
     pub fn y(&self) -> f64 {
         self.y
     }
 
+    #[allow(dead_code)]
     pub fn z(&self) -> f64 {
         self.z
     }
 
+    #[allow(dead_code)]
     pub fn len_squared(&self) -> f64 {
         (self.x * self.x) + (self.y * self.y) + (self.z * self.z)
     }
 
+    #[allow(dead_code)]
     pub fn len(&self) -> f64 {
         self.len_squared().sqrt()
     }
 
+    #[allow(dead_code)]
     pub fn dot(&self, _rhs: &Vec3) -> f64 {
         (self.x * _rhs.x) + (self.y * _rhs.y) + (self.z * _rhs.z)
     }
 
+    #[allow(dead_code)]
     pub fn cross(&self, _rhs: &Vec3) -> Vec3 {
         Vec3 {
             x: (self.y * _rhs.z) - (self.z * _rhs.y),
@@ -113,10 +129,12 @@ impl Vec3 {
         }
     }
 
+    #[allow(dead_code)]
     pub fn unit_vector(&self) -> Vec3 {
         self / self.len()
     }
 
+    #[allow(dead_code)]
     pub fn near_zero(&self) -> bool {
         // Return true if the vector is close to zero in all dimensions
         let thresh = 1e-8;
