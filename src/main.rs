@@ -22,9 +22,9 @@ fn main() {
     let material_center: Option<Rc<dyn Material>> =
         Some(Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5))));
     let material_left: Option<Rc<dyn Material>> =
-        Some(Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8))));
+        Some(Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8), 0.3)));
     let material_right: Option<Rc<dyn Material>> =
-        Some(Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2))));
+        Some(Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0)));
 
     let mut world = HittableList::new();
     world.add(Box::new(Sphere::new(
