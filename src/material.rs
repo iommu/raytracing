@@ -3,6 +3,7 @@ use std::{fmt::Debug, rc::Rc};
 use crate::{
     hittable::HitRecord,
     ray::Ray,
+    utils::random_double,
     vec3::{Color, Vec3},
 };
 
@@ -79,6 +80,8 @@ impl Material for Metal {
 
 #[derive(Debug, Clone)]
 pub struct Dielectric {
+    // Refractive index in vacuum or air, or the ratio of the material's refractive index over
+    // the refractive index of the enclosing media
     pub refraction_index: f64,
 }
 
@@ -87,6 +90,12 @@ impl Dielectric {
         Dielectric {
             refraction_index: refraction_index,
         }
+    }
+
+    fn reflectance(cosin: f64, refraction_index: f64) -> f64 {
+        // Use Schlick's approximation for reflectance.
+        let r0 = ((1.0 - refraction_index) / (1.0 + refraction_index)).powi(2);
+        return r0 + (1.0 - r0) * (1.0 - cosin).powi(5);
     }
 }
 
@@ -110,7 +119,7 @@ impl Material for Dielectric {
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
         let cannot_refract = ri * sin_theta > 1.0;
-        let direction = if cannot_refract {
+        let direction = if cannot_refract || Self::reflectance(cos_theta, ri) > random_double() {
             unit_direction.reflect(&rec.normal)
         } else {
             unit_direction.refract(&rec.normal, ri)
