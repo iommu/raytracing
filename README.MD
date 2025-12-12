@@ -25,5 +25,18 @@ Like in the origin tutorial this operates by using shell pipes to write the `std
 This project was developed on Linux and while it should compile on Windows and Mac OS, it's untested and I don't know how you'd pipe the data in a traditional Windows shell. 
 
 ```Bash
- cargo run -r > image.ppm
- ```
+cargo run -r > image.ppm
+```
+
+## Profiling 
+
+Profiling was done very crudely with just a simple timer encapsulating the render fn. For relative consistenency
+* World random variables were disables (e.g. random textures for each sphere)
+* Computer CPU profile set to "Balanced"
+* Each profile is run twice
+* Samples and image size was turned down heavily 
+* Image data was piped to /dev/null
+
+Commit ID : test 1, test 2
+
+709b4f977a1d9cd440e241b725ee9467432abf36 : 15.791569448s, 15.835566534s
