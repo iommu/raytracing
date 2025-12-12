@@ -1,9 +1,9 @@
-use crate::vec3::{Vec3, Point3};
+use crate::vec3::{Point3, Vec3};
 
 #[derive(Debug, Clone)]
 pub struct Ray {
     origin: Point3, // point
-    dir: Vec3,    // vector
+    dir: Vec3,      // vector
 }
 
 impl Ray {
@@ -11,6 +11,13 @@ impl Ray {
         Ray {
             origin: origin.clone(),
             dir: dir.clone(),
+        }
+    }
+
+    pub fn default() -> Ray {
+        Ray {
+            origin: Vec3::default(),
+            dir: Vec3::default(),
         }
     }
 
@@ -22,7 +29,7 @@ impl Ray {
         &self.dir
     }
 
-    pub fn at(&self, t : f64) -> Vec3 {
-        &self.origin + &(&self.dir*t)
+    pub fn at(&self, t: f64) -> Vec3 {
+        &self.origin + &(&self.dir * t)
     }
 }

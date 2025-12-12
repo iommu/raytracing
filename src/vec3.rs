@@ -57,6 +57,10 @@ impl Vec3 {
         }
     }
 
+    pub fn reflect(&self, n : &Vec3) -> Vec3 {
+        self - &(n * (Vec3::dot(self, n) * 2.0))
+    }
+
     pub fn x(&self) -> f64 {
         self.x
     }
@@ -91,6 +95,12 @@ impl Vec3 {
 
     pub fn unit_vector(&self) -> Vec3 {
         self / self.len()
+    }
+
+    pub fn near_zero(&self) -> bool {
+        // Return true if the vector is close to zero in all dimensions
+        let thresh = 1e-8;
+        return (self.x.abs() < thresh) && (self.y.abs() < thresh) && (self.z.abs() < thresh);
     }
 }
 
