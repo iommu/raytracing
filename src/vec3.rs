@@ -66,7 +66,7 @@ impl Vec3 {
         let ray_out_perp = &(self + &(n*cos_theta)) * etai_over_etat;
         let ray_out_para = n * ((1.0 - ray_out_perp.len_squared()).abs().sqrt() * -1.0);
         &ray_out_perp + &ray_out_para
-    }
+    } 
 
     pub fn x(&self) -> f64 {
         self.x
@@ -135,9 +135,9 @@ impl ops::DivAssign<f64> for Vec3 {
     }
 }
 
-impl<'a, 'b> ops::Add<&'b Vec3> for &'a Vec3 {
+impl ops::Add for &Vec3 {
     type Output = Vec3;
-    fn add(self, _rhs: &'b Vec3) -> Vec3 {
+    fn add(self, _rhs: &Vec3) -> Vec3 {
         Vec3 {
             x: self.x + _rhs.x,
             y: self.y + _rhs.y,
@@ -146,7 +146,7 @@ impl<'a, 'b> ops::Add<&'b Vec3> for &'a Vec3 {
     }
 }
 
-impl<'a> ops::Add<f64> for &'a Vec3 {
+impl ops::Add<f64> for &Vec3 {
     type Output = Vec3;
     fn add(self, _rhs: f64) -> Vec3 {
         Vec3 {
@@ -157,9 +157,9 @@ impl<'a> ops::Add<f64> for &'a Vec3 {
     }
 }
 
-impl<'a, 'b> ops::Sub<&'b Vec3> for &'a Vec3 {
+impl ops::Sub for &Vec3 {
     type Output = Vec3;
-    fn sub(self, _rhs: &'b Vec3) -> Vec3 {
+    fn sub(self, _rhs: &Vec3) -> Vec3 {
         Vec3 {
             x: self.x - _rhs.x,
             y: self.y - _rhs.y,
@@ -168,7 +168,7 @@ impl<'a, 'b> ops::Sub<&'b Vec3> for &'a Vec3 {
     }
 }
 
-impl<'a> ops::Div<f64> for &'a Vec3 {
+impl ops::Div<f64> for &Vec3 {
     type Output = Vec3;
     fn div(self, _rhs: f64) -> Vec3 {
         Vec3 {
@@ -179,7 +179,7 @@ impl<'a> ops::Div<f64> for &'a Vec3 {
     }
 }
 
-impl<'a> ops::Mul<f64> for &'a Vec3 {
+impl ops::Mul<f64> for &Vec3 {
     type Output = Vec3;
     fn mul(self, _rhs: f64) -> Vec3 {
         Vec3 {
@@ -190,13 +190,24 @@ impl<'a> ops::Mul<f64> for &'a Vec3 {
     }
 }
 
-impl<'a, 'b> ops::Mul<&'b Vec3> for &'a Vec3 {
+impl ops::Mul for &Vec3 {
     type Output = Vec3;
-    fn mul(self, _rhs: &'b Vec3) -> Vec3 {
+    fn mul(self, _rhs: &Vec3) -> Vec3 {
         Vec3 {
             x: self.x * _rhs.x,
             y: self.y * _rhs.y,
             z: self.z * _rhs.z,
+        }
+    }
+}
+
+impl ops::Neg for &Vec3 {
+    type Output = Vec3;
+    fn neg(self) -> Self::Output {
+        Vec3 {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
         }
     }
 }
