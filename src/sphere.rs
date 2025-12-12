@@ -38,9 +38,9 @@ impl Hittable for Sphere {
 
         // Find the nearest root that lies in the acceptable range
         let mut root = (h - sqrtd) / a;
-        if root <= ray_t.min || ray_t.max <= root {
+        if !ray_t.surrounds(root) {
             root = (h + sqrtd) / a;
-            if root <= ray_t.min || ray_t.max <= root {
+            if !ray_t.surrounds(root) {
                 return false;
             }
         }
@@ -49,7 +49,6 @@ impl Hittable for Sphere {
         rec.p = ray.at(rec.t);
         let outward_normal = &(&rec.p - &self.center) / self.radius;
         rec.set_face_normal(ray, &outward_normal);
-        rec.normal = &(&rec.p - &self.center) / self.radius;
         rec.mat = self.mat.clone();
 
         return true;
