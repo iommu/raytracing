@@ -61,9 +61,9 @@ impl Vec3 {
         self - &(n * (Vec3::dot(self, n) * 2.0))
     }
 
-    pub fn refract(uv : &Vec3, n :&Vec3, etai_over_etat : f64) -> Vec3 {
-        let cos_theta = f64::min((uv * -1.0).dot(n), 1.0);
-        let ray_out_perp = &(uv + &(n*cos_theta)) * etai_over_etat;
+    pub fn refract(&self, n :&Vec3, etai_over_etat : f64) -> Vec3 {
+        let cos_theta = f64::min((self * -1.0).dot(n), 1.0);
+        let ray_out_perp = &(self + &(n*cos_theta)) * etai_over_etat;
         let ray_out_para = n * ((1.0 - ray_out_perp.len_squared()).abs().sqrt() * -1.0);
         &ray_out_perp + &ray_out_para
     }
