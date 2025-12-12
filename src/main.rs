@@ -15,63 +15,89 @@ use material::{Dielectric, Lambertian, Material, Metal};
 use sphere::Sphere;
 use vec3::{Color, Vec3};
 
-use crate::vec3::Point3;
+use crate::{
+    utils::{random_double, random_double_range},
+    vec3::Point3,
+};
 
 fn main() {
     let mut world = HittableList::new();
 
-    let R = (PI / 4.0).cos();
-
     // World setup
     let material_ground: Option<Rc<dyn Material>> =
         Some(Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0))));
-    let material_center: Option<Rc<dyn Material>> =
-        Some(Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5))));
-    let material_left: Option<Rc<dyn Material>> = Some(Rc::new(Dielectric::new(1.50)));
-    let material_bubble: Option<Rc<dyn Material>> = Some(Rc::new(Dielectric::new(1.0 / 1.50)));
-    let material_right: Option<Rc<dyn Material>> =
-        Some(Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0)));
 
     world.add(Box::new(Sphere::new(
-        &Vec3::new(0.0, -100.5, -1.0),
-        100.0,
+        &Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
         &material_ground,
     )));
+
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = random_double();
+            let center = Point3::new(
+                a as f64 + 0.9 * random_double(),
+                0.2,
+                b as f64 + 0.9 * random_double(),
+            );
+
+            if (&center - &Point3::new(4.0, 0.2, 0.0)).len() > 0.9 {
+                let sphere_material: Option<Rc<dyn Material>> = if choose_mat < 0.8 {
+                    // Diffuse
+                    let albedo = &Color::random() * &Color::random();
+                    Some(Rc::new(Lambertian::new(albedo)))
+                } else if choose_mat < 0.95 {
+                    // Metal
+                    let albedo = Color::random_from_range(0.5, 1.0);
+                    let fuzz = random_double_range(0.0, 0.5);
+                    Some(Rc::new(Metal::new(albedo, fuzz)))
+                } else {
+                    // Glass
+                    Some(Rc::new(Dielectric::new(1.5)))
+                };
+
+                world.add(Box::new(Sphere::new(&center, 0.2, &sphere_material)));
+            }
+        }
+    }
+
+    let material_1: Option<Rc<dyn Material>> = Some(Rc::new(Dielectric::new(1.5)));
+    let material_2: Option<Rc<dyn Material>> =
+        Some(Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1))));
+    let material_3: Option<Rc<dyn Material>> =
+        Some(Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0)));
+
     world.add(Box::new(Sphere::new(
-        &Vec3::new(0.0, 0.0, -1.2),
-        0.5,
-        &material_center,
+        &Vec3::new(0.0, 1.0, 0.0),
+        1.0,
+        &material_1,
     )));
     world.add(Box::new(Sphere::new(
-        &Vec3::new(-1.0, 0.0, -1.0),
-        0.5,
-        &material_left,
+        &Vec3::new(-4.0, 1.0, 0.0),
+        1.0,
+        &material_2,
     )));
     world.add(Box::new(Sphere::new(
-        &Vec3::new(-1.0, 0.0, -1.0),
-        0.4,
-        &material_bubble,
-    )));
-    world.add(Box::new(Sphere::new(
-        &Vec3::new(1.0, 0.0, -1.0),
-        0.5,
-        &material_right,
+        &Vec3::new(4.0, 1.0, 0.0),
+        1.0,
+        &material_3,
     )));
 
     // Camera setup
     let mut camera = Camera::default();
     camera.aspect_ratio = 16.0 / 9.0;
-    camera.image_width = 400;
-    camera.samples_per_pixel = 100;
+    camera.image_width = 1200;
+    camera.samples_per_pixel = 500;
     camera.max_depth = 50;
 
     camera.vfov = 20.0;
-    camera.lookfrom = Point3::new(-2.0, 2.0, 1.0);
-    camera.lookat = Point3::new(0.0, 0.0, -1.0);
+    camera.lookfrom = Point3::new(13.0, 2.0, 3.0);
+    camera.lookat = Point3::new(0.0, 0.0, 0.0);
     camera.vup = Vec3::new(0.0, 1.0, 0.0);
 
-    camera.defocus_angle = 10.0;
-    camera.focus_dist = 3.4;
+    camera.defocus_angle = 0.6;
+    camera.focus_dist = 10.0;
 
     // Render
     camera.render(&world);
