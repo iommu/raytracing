@@ -11,7 +11,7 @@ use std::rc::Rc;
 
 use camera::Camera;
 use hittable::HittableList;
-use material::{Lambertian, Material, Metal, Dialectric};
+use material::{Lambertian, Material, Metal, Dielectric};
 use sphere::Sphere;
 use vec3::{Color, Vec3};
 
@@ -22,7 +22,7 @@ fn main() {
     let material_center: Option<Rc<dyn Material>> =
         Some(Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5))));
     let material_left: Option<Rc<dyn Material>> =
-        Some(Rc::new(Dialectric::new(1.5)));
+        Some(Rc::new(Dielectric::new(1.5)));
     let material_right: Option<Rc<dyn Material>> =
         Some(Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0)));
 

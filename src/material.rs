@@ -78,19 +78,19 @@ impl Material for Metal {
 }
 
 #[derive(Debug, Clone)]
-pub struct Dialectric {
+pub struct Dielectric {
     pub refraction_index: f64,
 }
 
-impl Dialectric {
-    pub fn new(refraction_index: f64) -> Dialectric {
-        Dialectric {
+impl Dielectric {
+    pub fn new(refraction_index: f64) -> Dielectric {
+        Dielectric {
             refraction_index: refraction_index,
         }
     }
 }
 
-impl Material for Dialectric {
+impl Material for Dielectric {
     fn scatter(
         &self,
         ray_in: &Ray,
