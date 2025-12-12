@@ -21,7 +21,8 @@ fn main() {
         Some(Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0))));
     let material_center: Option<Rc<dyn Material>> =
         Some(Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5))));
-    let material_left: Option<Rc<dyn Material>> = Some(Rc::new(Dielectric::new(1.0 / 1.33)));
+    let material_left: Option<Rc<dyn Material>> = Some(Rc::new(Dielectric::new(1.50)));
+    let material_bubble: Option<Rc<dyn Material>> = Some(Rc::new(Dielectric::new(1.0 / 1.50)));
     let material_right: Option<Rc<dyn Material>> =
         Some(Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0)));
 
@@ -40,6 +41,11 @@ fn main() {
         &Vec3::new(-1.0, 0.0, -1.0),
         0.5,
         &material_left,
+    )));
+    world.add(Box::new(Sphere::new(
+        &Vec3::new(-1.0, 0.0, -1.0),
+        0.4,
+        &material_bubble,
     )));
     world.add(Box::new(Sphere::new(
         &Vec3::new(1.0, 0.0, -1.0),
