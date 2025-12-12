@@ -98,7 +98,6 @@ impl Material for Dialectric {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        eprintln!("scattering");
         *attenuation = Color::new(1.0, 1.0, 1.0);
         let ri = if rec.front_face {
             1.0 / self.refraction_index
@@ -106,15 +105,8 @@ impl Material for Dialectric {
             self.refraction_index
         };
 
-// unit dir good
-
         let unit_direction = ray_in.direction().unit_vector();
-
-
         let refracted = Vec3::refract(&unit_direction, &rec.normal, ri);
-                                eprintln!("{:?}", rec.normal);
-
-                        eprintln!("{:?}", refracted);
 
         *scattered = Ray::new(&rec.p, &refracted);
         return true;
