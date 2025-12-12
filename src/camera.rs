@@ -31,8 +31,11 @@ pub struct Camera {
     pub image_width: i32,
     pub samples_per_pixel: i32,
     pub max_depth: i32,
-    
+
     pub vfov: f64,
+    pub lookfrom: Point3,
+    pub lookat: Point3,
+    pub vup: Vec3,
 
     pixel_samples_scale: f64,
     image_height: i32,
@@ -40,6 +43,9 @@ pub struct Camera {
     pixel00_loc: Point3,
     pixel_delta_u: Vec3,
     pixel_delta_v: Vec3,
+    u: Vec3,
+    v: Vec3,
+    w: Vec3,
 }
 
 impl Camera {
@@ -49,13 +55,19 @@ impl Camera {
             image_width: 100,
             samples_per_pixel: 10,
             max_depth: 10,
-            vfov : 90.0,
+            vfov: 90.0,
+            lookfrom: Point3::new(0.0, 0.0, 0.0),
+            lookat: Point3::new(0.0, 0.0, -1.0),
+            vup: Vec3::new(0.0, 1.0, 0.0),
             pixel_samples_scale: 0.0,
             image_height: 0,
             center: Point3::default(),
             pixel00_loc: Point3::default(),
             pixel_delta_u: Vec3::default(),
             pixel_delta_v: Vec3::default(),
+            u: Vec3::default(),
+            v: Vec3::default(),
+            w: Vec3::default(),
         }
     }
 
@@ -87,27 +99,31 @@ impl Camera {
 
         self.pixel_samples_scale = 1.0 / self.samples_per_pixel as f64;
 
-        self.center = Point3::default();
+        self.center = self.lookfrom.clone();
 
         // Determine viewport dimensions.
-        let focal_length = 1.0;
+        let focal_length = (&self.lookfrom - &self.lookat).len();
         let theta = degrees_to_radians(self.vfov);
-        let h = (theta/2.0).tan();
+        let h = (theta / 2.0).tan();
         let viewport_height = 2.0 * h * focal_length;
         let viewport_width = viewport_height * (self.image_width as f64 / self.image_height as f64);
 
+        // Calculate the u,v,w unit basis vectors for the camera coordinate frame
+        self.w = (&self.lookfrom - &self.lookat).unit_vector();
+        self.u = self.vup.cross(&self.w).unit_vector();
+        self.v = self.w.cross(&self.u);
+
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
-        let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
-        let viewport_v = Vec3::new(0.0, -viewport_height, 0.0);
+        let viewport_u = &self.u * viewport_width;
+        let viewport_v = &-&self.v * viewport_height;
 
         // Calculate the horizontal and vertical delta vectors from pixel to pixel.
         self.pixel_delta_u = &viewport_u / self.image_width as f64;
         self.pixel_delta_v = &viewport_v / self.image_height as f64;
 
         // Calculate the location of the upper left pixel.
-        let viewport_upper_left = &(&(&self.center - &Vec3::new(0.0, 0.0, focal_length))
-            - &(&viewport_u / 2.0))
-            - &(&viewport_v / 2.0);
+        let viewport_upper_left =
+            &self.center - &(&self.w * focal_length) - (&viewport_u / 2.0) - (&viewport_v / 2.0);
         self.pixel00_loc =
             &viewport_upper_left + &(&(&self.pixel_delta_u + &self.pixel_delta_v) * 0.5);
     }
