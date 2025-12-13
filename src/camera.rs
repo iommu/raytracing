@@ -82,6 +82,8 @@ impl Camera {
                 self.write_color(&(pixel_color * self.pixel_samples_scale));
             }
         }
+
+        let _ = self.exporter.flush();
     }
 
     fn initialize(&mut self) {

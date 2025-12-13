@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{self, Write},
+    io::{self, BufWriter, Write},
     path::Path,
 };
 
@@ -12,11 +12,12 @@ pub trait Exporter {
     fn set_dims(&mut self, width: i32, height: i32);
     fn write_header(&mut self) -> io::Result<()>;
     fn write_pixel(&mut self, color: Color) -> io::Result<()>;
+    fn flush(&mut self) -> io::Result<()>;
 }
 
 #[derive(Debug)]
 pub struct PPMExporter {
-    file: File,
+    file: BufWriter<File>,
     width: i32,
     height: i32,
 }
@@ -26,7 +27,7 @@ impl PPMExporter {
     pub fn new<P: AsRef<Path>>(path: P) -> io::Result<Self> {
         let file = File::create(path)?;
         Ok(Self {
-            file: file,
+            file: BufWriter::new(file),
             width: 0,
             height: 0,
         })
@@ -62,11 +63,16 @@ impl Exporter for PPMExporter {
 
         Ok(())
     }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.file.flush()?;
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
 pub struct BMPExporter {
-    file: File,
+    file: BufWriter<File>,
     width: i32,
     height: i32,
 }
@@ -76,7 +82,7 @@ impl BMPExporter {
     pub fn new<P: AsRef<Path>>(path: P) -> io::Result<Self> {
         let file = File::create(path)?;
         Ok(Self {
-            file: file,
+            file: BufWriter::new(file),
             width: 0,
             height: 0,
         })
@@ -129,6 +135,11 @@ impl Exporter for BMPExporter {
         file.write_u8(g)?;
         file.write_u8(b)?;
 
+        Ok(())
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.file.flush()?;
         Ok(())
     }
 }
