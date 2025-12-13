@@ -1,26 +1,14 @@
+use derive_new::new as New;
+
 use crate::vec3::{Point3, Vec3};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, New, Default)]
 pub struct Ray {
     origin: Point3, // point
     dir: Vec3,      // vector
 }
 
 impl Ray {
-    pub fn new(origin: &Vec3, dir: &Vec3) -> Ray {
-        Ray {
-            origin: origin.clone(),
-            dir: dir.clone(),
-        }
-    }
-
-    pub fn default() -> Ray {
-        Ray {
-            origin: Vec3::default(),
-            dir: Vec3::default(),
-        }
-    }
-
     pub fn origin(&self) -> &Vec3 {
         &self.origin
     }

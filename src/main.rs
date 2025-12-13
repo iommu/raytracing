@@ -24,9 +24,9 @@ fn main() {
         Some(Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0))));
 
     world.add(Box::new(Sphere::new(
-        &Vec3::new(0.0, -1000.0, 0.0),
+        Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
-        &material_ground,
+        material_ground,
     )));
 
     for a in -11..11 {
@@ -49,7 +49,7 @@ fn main() {
                     Some(Rc::new(Dielectric::new(1.5)))
                 };
 
-                world.add(Box::new(Sphere::new(&center, 0.2, &sphere_material)));
+                world.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
             }
         }
     }
@@ -61,19 +61,19 @@ fn main() {
         Some(Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0)));
 
     world.add(Box::new(Sphere::new(
-        &Vec3::new(0.0, 1.0, 0.0),
+        Vec3::new(0.0, 1.0, 0.0),
         1.0,
-        &material_1,
+        material_1,
     )));
     world.add(Box::new(Sphere::new(
-        &Vec3::new(-4.0, 1.0, 0.0),
+        Vec3::new(-4.0, 1.0, 0.0),
         1.0,
-        &material_2,
+        material_2,
     )));
     world.add(Box::new(Sphere::new(
-        &Vec3::new(4.0, 1.0, 0.0),
+        Vec3::new(4.0, 1.0, 0.0),
         1.0,
-        &material_3,
+        material_3,
     )));
 
     // Camera setup

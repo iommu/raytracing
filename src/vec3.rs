@@ -1,8 +1,10 @@
 use std::ops;
 
+use derive_new::new as New;
+
 use crate::utils::{random_double, random_double_range};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, New, Default)]
 pub struct Vec3 {
     x: f64,
     y: f64,
@@ -10,20 +12,6 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
-    #[allow(dead_code)]
-    pub fn default() -> Vec3 {
-        Vec3 {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-        }
-    }
-
-    #[allow(dead_code)]
-    pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
-        Vec3 { x: x, y: y, z: z }
-    }
-
     #[allow(dead_code)]
     pub fn random() -> Vec3 {
         Vec3 {

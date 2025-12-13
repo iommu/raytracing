@@ -1,4 +1,6 @@
-use std::{fmt::Debug};
+use std::fmt::Debug;
+
+use derive_new::new as New;
 
 use crate::{
     hittable::HitRecord,
@@ -19,16 +21,12 @@ pub trait Material: Debug {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, New, Default)]
 pub struct Lambertian {
     pub albedo: Color,
 }
 
-impl Lambertian {
-    pub fn new(albedo: Color) -> Lambertian {
-        Lambertian { albedo: albedo }
-    }
-}
+impl Lambertian {}
 
 impl Material for Lambertian {
     fn scatter(
@@ -39,13 +37,13 @@ impl Material for Lambertian {
         scattered: &mut Ray,
     ) -> bool {
         let scatter_direction = rec.normal + Vec3::random_unit_vector();
-        *scattered = Ray::new(&rec.p, &scatter_direction);
+        *scattered = Ray::new(rec.p, scatter_direction);
         *attenuation = self.albedo.clone();
         return true;
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct Metal {
     pub albedo: Color,
     pub fuzz: f64,
@@ -72,7 +70,7 @@ impl Material for Metal {
     ) -> bool {
         let reflected = Vec3::reflect(ray_in.direction(), rec.normal).unit_vector()
             + (Vec3::random_unit_vector() * self.fuzz);
-        *scattered = Ray::new(&rec.p, &reflected);
+        *scattered = Ray::new(rec.p, reflected);
         *attenuation = self.albedo.clone();
         return Vec3::dot(scattered.direction(), rec.normal) > 0.0;
     }
@@ -125,7 +123,7 @@ impl Material for Dielectric {
             unit_direction.refract(rec.normal, ri)
         };
 
-        *scattered = Ray::new(&rec.p, &direction);
+        *scattered = Ray::new(rec.p, direction);
         return true;
     }
 }

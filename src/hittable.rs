@@ -1,30 +1,24 @@
-use crate::interval::Interval;
-use crate::material::Material;
-use crate::ray::Ray;
-use crate::vec3::{Point3, Vec3};
 use std::rc::Rc;
 
-#[derive(Debug, Clone)]
+use derive_new::new as New;
+
+use crate::{
+    interval::Interval,
+    material::Material,
+    ray::Ray,
+    vec3::{Point3, Vec3},
+};
+
+#[derive(Debug, Clone, New, Default)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
-    pub mat : Option<Rc<dyn Material>>,
+    pub mat: Option<Rc<dyn Material>>,
     pub t: f64,
     pub front_face: bool,
 }
 
 impl HitRecord {
-    #[allow(dead_code)]
-    pub fn new() -> HitRecord {
-        HitRecord {
-            p: Point3::new(0.0, 0.0, 0.0),
-            normal: Vec3::new(0.0, 0.0, 0.0),
-            mat: None,
-            t: 0.0,
-            front_face: false,
-        }
-    }
-
     #[allow(dead_code)]
     pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vec3) {
         // Sets the hit record normal vector
@@ -68,7 +62,7 @@ impl HittableList {
 
 impl Hittable for HittableList {
     fn hit(&self, ray: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
-        let mut temp_rec = HitRecord::new();
+        let mut temp_rec = HitRecord::default();
         let mut hit_anything = false;
         let mut closest_so_far = ray_t.max;
 

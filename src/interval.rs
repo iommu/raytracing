@@ -1,25 +1,25 @@
 use std::f64::INFINITY;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Interval {
-    pub min : f64,
-    pub max : f64,
+    pub min: f64,
+    pub max: f64,
 }
 
 impl Interval {
     #[allow(dead_code)]
     pub fn empty() -> Interval {
         Interval {
-            min : INFINITY,
-            max : -INFINITY,
+            min: INFINITY,
+            max: -INFINITY,
         }
     }
 
     #[allow(dead_code)]
     pub fn universe() -> Interval {
         Interval {
-            min : -INFINITY,
-            max : INFINITY,
+            min: -INFINITY,
+            max: INFINITY,
         }
     }
 
@@ -29,11 +29,8 @@ impl Interval {
     }
 
     #[allow(dead_code)]
-    pub fn new(min : f64, max : f64) -> Interval {
-        Interval {
-            min : min,
-            max : max,
-        }
+    pub fn new(min: f64, max: f64) -> Interval {
+        Interval { min: min, max: max }
     }
 
     #[allow(dead_code)]
@@ -42,17 +39,17 @@ impl Interval {
     }
 
     #[allow(dead_code)]
-    pub fn contains(&self, x : f64) -> bool {
+    pub fn contains(&self, x: f64) -> bool {
         (self.min <= x) && (x <= self.max)
     }
 
     #[allow(dead_code)]
-    pub fn surrounds(&self, x : f64) -> bool {
+    pub fn surrounds(&self, x: f64) -> bool {
         (self.min < x) && (x < self.max)
     }
 
     #[allow(dead_code)]
-    pub fn clamp(&self, x : f64) -> f64 {
+    pub fn clamp(&self, x: f64) -> f64 {
         if x < self.min {
             self.min
         } else if x > self.max {

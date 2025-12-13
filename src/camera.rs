@@ -1,10 +1,12 @@
 use std::f64::INFINITY;
 
-use crate::hittable::{HitRecord, Hittable};
-use crate::interval::Interval;
-use crate::ray::Ray;
-use crate::utils::{degrees_to_radians, linear_to_gamma, random_double};
-use crate::vec3::{Color, Point3, Vec3};
+use crate::{
+    hittable::{HitRecord, Hittable},
+    interval::Interval,
+    ray::Ray,
+    utils::{degrees_to_radians, linear_to_gamma, random_double},
+    vec3::{Color, Point3, Vec3},
+};
 
 fn write_color(color: &Color) {
     let mut r = color.x();
@@ -86,7 +88,7 @@ impl Camera {
         print!("P3\n{} {}\n255\n", self.image_width, self.image_height);
 
         for j in 0..self.image_height {
-            eprint!("Scanlines remaining: {}    \r", (self.image_height-j));
+            eprint!("Scanlines remaining: {}    \r", (self.image_height - j));
             for i in 0..self.image_width {
                 let mut pixel_color = Color::default();
                 for _ in 0..self.samples_per_pixel {
@@ -133,11 +135,10 @@ impl Camera {
         // Calculate the location of the upper left pixel.
         let viewport_upper_left =
             self.center - (self.w * self.focus_dist) - (viewport_u / 2.0) - (viewport_v / 2.0);
-        self.pixel00_loc =
-            viewport_upper_left + ((self.pixel_delta_u + self.pixel_delta_v) * 0.5);
+        self.pixel00_loc = viewport_upper_left + ((self.pixel_delta_u + self.pixel_delta_v) * 0.5);
 
-            // Calculate the camera defocus disk basis vectors
-        let defocus_radius = self.focus_dist * degrees_to_radians(self.defocus_angle/2.0).tan();
+        // Calculate the camera defocus disk basis vectors
+        let defocus_radius = self.focus_dist * degrees_to_radians(self.defocus_angle / 2.0).tan();
         self.defocus_disk_u = self.u * defocus_radius;
         self.defocus_disk_v = self.v * defocus_radius;
     }
@@ -168,7 +169,7 @@ impl Camera {
         };
         let ray_direction = pixel_sample - ray_origin;
 
-        Ray::new(&ray_origin, &ray_direction)
+        Ray::new(ray_origin, ray_direction)
     }
 
     fn ray_color<T: Hittable>(ray: &Ray, depth: i32, world: &T) -> Color {
@@ -176,7 +177,7 @@ impl Camera {
             return Color::new(0.0, 0.0, 0.0);
         }
 
-        let mut rec = HitRecord::new();
+        let mut rec = HitRecord::default();
 
         if world.hit(ray, Interval::new(0.001, INFINITY), &mut rec) {
             let mut scattered = Ray::default();
