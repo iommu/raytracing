@@ -16,8 +16,11 @@ use hittable::HittableList;
 use material::{Dielectric, Lambertian, Material, Metal};
 use sphere::Sphere;
 use vec3::{Color, Point3, Vec3};
+use exporter::{BMPExporter, PPMExporter, Exporter};
 
 fn main() -> io::Result<()> {
+    let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
+
     let mut world = HittableList::new();
 
     // World setup
@@ -78,7 +81,7 @@ fn main() -> io::Result<()> {
     )));
 
     // Camera setup
-    let mut camera = Camera::default();
+    let mut camera = Camera::from_exporter(exporter);
     camera.aspect_ratio = 16.0 / 9.0;
     camera.image_width = 600;
     camera.samples_per_pixel = 10;

@@ -1,7 +1,7 @@
 use std::f64::INFINITY;
 
 use crate::{
-    exporter::{BMPExporter, Exporter},
+    exporter::Exporter,
     hittable::{HitRecord, Hittable},
     interval::Interval,
     ray::Ray,
@@ -34,11 +34,11 @@ pub struct Camera {
     w: Vec3,
     defocus_disk_u: Vec3,
     defocus_disk_v: Vec3,
-    exporter: BMPExporter,
+    exporter: Box<dyn Exporter>,
 }
 
 impl Camera {
-    pub fn default() -> Camera {
+    pub fn from_exporter(exporter : Box<dyn Exporter>) -> Camera {
         Camera {
             aspect_ratio: 1.0,
             image_width: 100,
@@ -62,17 +62,14 @@ impl Camera {
             defocus_disk_u: Vec3::default(),
             defocus_disk_v: Vec3::default(),
             // todo, don't unwrap
-            exporter: BMPExporter::new("test.bmp").unwrap(),
+            exporter: exporter,
         }
     }
 
     pub fn render<T: Hittable>(&mut self, world: &T) {
         self.initialize();
 
-        self.exporter.set_dims(self.image_width, self.image_height);
-
         let _ = self.exporter.write_header();
-        // print!("P3\n{} {}\n255\n", self.image_width, self.image_height);
 
         for j in 0..self.image_height {
             eprint!("Scanlines remaining: {}    \r", (self.image_height - j));
@@ -128,6 +125,9 @@ impl Camera {
         let defocus_radius = self.focus_dist * degrees_to_radians(self.defocus_angle / 2.0).tan();
         self.defocus_disk_u = self.u * defocus_radius;
         self.defocus_disk_v = self.v * defocus_radius;
+
+        // Setup the exporter class
+        self.exporter.set_dims(self.image_width, self.image_height);
     }
 
     fn sample_square() -> Vec3 {
@@ -196,14 +196,5 @@ impl Camera {
         b = linear_to_gamma(b);
 
         let _ = self.exporter.write_pixel(Color::new(r, g, b));
-
-        // // Translate the [0,1] component values to the byte range [0,255]
-        // let intensity = Interval::new(0.0, 0.999);
-        // let ir = (255.999 * intensity.clamp(r)) as i64;
-        // let ig = (255.999 * intensity.clamp(g)) as i64;
-        // let ib = (255.999 * intensity.clamp(b)) as i64;
-
-        // // Write out the pixel color components
-        // print!("{ir} {ig} {ib}\n");
     }
 }
