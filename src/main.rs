@@ -1,4 +1,5 @@
 mod camera;
+mod exporter;
 mod hittable;
 mod interval;
 mod material;
@@ -7,8 +8,8 @@ mod sphere;
 mod utils;
 mod vec3;
 
-use std::rc::Rc;
 use std::time::Instant;
+use std::{io, rc::Rc};
 
 use camera::Camera;
 use hittable::HittableList;
@@ -16,7 +17,7 @@ use material::{Dielectric, Lambertian, Material, Metal};
 use sphere::Sphere;
 use vec3::{Color, Point3, Vec3};
 
-fn main() {
+fn main() -> io::Result<()> {
     let mut world = HittableList::new();
 
     // World setup
@@ -96,4 +97,6 @@ fn main() {
     camera.render(&world);
     let duration = start.elapsed();
     eprintln!("render time: {:?}", duration);
+
+    Ok(())
 }

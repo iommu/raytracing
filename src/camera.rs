@@ -1,32 +1,13 @@
 use std::f64::INFINITY;
 
 use crate::{
+    exporter::{BMPExporter, Exporter},
     hittable::{HitRecord, Hittable},
     interval::Interval,
     ray::Ray,
     utils::{degrees_to_radians, linear_to_gamma, random_double},
     vec3::{Color, Point3, Vec3},
 };
-
-fn write_color(color: &Color) {
-    let mut r = color.x();
-    let mut g = color.y();
-    let mut b = color.z();
-
-    // Apply a linear to gamma transform for gamma 2
-    r = linear_to_gamma(r);
-    g = linear_to_gamma(g);
-    b = linear_to_gamma(b);
-
-    // Translate the [0,1] component values to the byte range [0,255]
-    let intensity = Interval::new(0.0, 0.999);
-    let ir = (255.999 * intensity.clamp(r)) as i64;
-    let ig = (255.999 * intensity.clamp(g)) as i64;
-    let ib = (255.999 * intensity.clamp(b)) as i64;
-
-    // Write out the pixel color components
-    print!("{ir} {ig} {ib}\n");
-}
 
 pub struct Camera {
     pub aspect_ratio: f64,
@@ -53,6 +34,7 @@ pub struct Camera {
     w: Vec3,
     defocus_disk_u: Vec3,
     defocus_disk_v: Vec3,
+    exporter: BMPExporter,
 }
 
 impl Camera {
@@ -79,13 +61,18 @@ impl Camera {
             w: Vec3::default(),
             defocus_disk_u: Vec3::default(),
             defocus_disk_v: Vec3::default(),
+            // todo, don't unwrap
+            exporter: BMPExporter::new("test.bmp").unwrap(),
         }
     }
 
     pub fn render<T: Hittable>(&mut self, world: &T) {
         self.initialize();
 
-        print!("P3\n{} {}\n255\n", self.image_width, self.image_height);
+        self.exporter.set_dims(self.image_width, self.image_height);
+
+        let _ = self.exporter.write_header();
+        // print!("P3\n{} {}\n255\n", self.image_width, self.image_height);
 
         for j in 0..self.image_height {
             eprint!("Scanlines remaining: {}    \r", (self.image_height - j));
@@ -95,7 +82,7 @@ impl Camera {
                     let ray = self.get_ray(i, j);
                     pixel_color += Self::ray_color(&ray, self.max_depth, world);
                 }
-                write_color(&(pixel_color * self.pixel_samples_scale));
+                self.write_color(&(pixel_color * self.pixel_samples_scale));
             }
         }
     }
@@ -196,5 +183,27 @@ impl Camera {
         let a = 0.5 * (unit_dir.y() + 1.0);
 
         (Color::new(1.0, 1.0, 1.0) * (1.0 - a)) + (Color::new(0.5, 0.7, 1.0) * a)
+    }
+
+    fn write_color(&mut self, color: &Color) {
+        let mut r = color.x();
+        let mut g = color.y();
+        let mut b = color.z();
+
+        // Apply a linear to gamma transform for gamma 2
+        r = linear_to_gamma(r);
+        g = linear_to_gamma(g);
+        b = linear_to_gamma(b);
+
+        let _ = self.exporter.write_pixel(Color::new(r, g, b));
+
+        // // Translate the [0,1] component values to the byte range [0,255]
+        // let intensity = Interval::new(0.0, 0.999);
+        // let ir = (255.999 * intensity.clamp(r)) as i64;
+        // let ig = (255.999 * intensity.clamp(g)) as i64;
+        // let ib = (255.999 * intensity.clamp(b)) as i64;
+
+        // // Write out the pixel color components
+        // print!("{ir} {ig} {ib}\n");
     }
 }
