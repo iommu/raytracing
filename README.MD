@@ -25,7 +25,7 @@ Like in the origin tutorial this operates by using shell pipes to write the `std
 This project was developed on Linux and while it should compile on Windows and Mac OS, it's untested and I don't know how you'd pipe the data in a traditional Windows shell. 
 
 ```Bash
-cargo run -r > image.ppm
+cargo run -r
 ```
 
 ## Profiling 
