@@ -2,7 +2,7 @@ use std::ops;
 
 use crate::utils::{random_double, random_double_range};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
     x: f64,
     y: f64,
@@ -48,7 +48,7 @@ impl Vec3 {
             let point = Vec3::random_from_range(-1.0, 1.0);
             let len_s_point = point.len_squared();
             if 1e-160 < len_s_point && len_s_point <= 1.0 {
-                return &point / len_s_point;
+                return point / len_s_point;
             }
         }
     }
@@ -56,10 +56,10 @@ impl Vec3 {
     #[allow(dead_code)]
     pub fn random_on_hemisphere(&self) -> Vec3 {
         let on_unit_sphere = Self::random_unit_vector();
-        if Vec3::dot(&on_unit_sphere, self) > 0.0 {
+        if Vec3::dot(&on_unit_sphere, *self) > 0.0 {
             on_unit_sphere
         } else {
-            &on_unit_sphere * -1.0
+            on_unit_sphere * -1.0
         }
     }
 
@@ -78,16 +78,16 @@ impl Vec3 {
     }
 
     #[allow(dead_code)]
-    pub fn reflect(&self, n: &Vec3) -> Vec3 {
-        self - &(n * (Vec3::dot(self, n) * 2.0))
+    pub fn reflect(&self, n: Vec3) -> Vec3 {
+        *self - (n * (Vec3::dot(self, n) * 2.0))
     }
 
     #[allow(dead_code)]
-    pub fn refract(&self, n: &Vec3, etai_over_etat: f64) -> Vec3 {
-        let cos_theta = f64::min((self * -1.0).dot(n), 1.0);
-        let ray_out_perp = &(self + &(n * cos_theta)) * etai_over_etat;
+    pub fn refract(&self, n: Vec3, etai_over_etat: f64) -> Vec3 {
+        let cos_theta = f64::min((*self * -1.0).dot(n), 1.0);
+        let ray_out_perp = (*self + (n * cos_theta)) * etai_over_etat;
         let ray_out_para = n * ((1.0 - ray_out_perp.len_squared()).abs().sqrt() * -1.0);
-        &ray_out_perp + &ray_out_para
+        ray_out_perp + ray_out_para
     }
 
     #[allow(dead_code)]
@@ -116,12 +116,12 @@ impl Vec3 {
     }
 
     #[allow(dead_code)]
-    pub fn dot(&self, _rhs: &Vec3) -> f64 {
+    pub fn dot(&self, _rhs: Vec3) -> f64 {
         (self.x * _rhs.x) + (self.y * _rhs.y) + (self.z * _rhs.z)
     }
 
     #[allow(dead_code)]
-    pub fn cross(&self, _rhs: &Vec3) -> Vec3 {
+    pub fn cross(&self, _rhs: Vec3) -> Vec3 {
         Vec3 {
             x: (self.y * _rhs.z) - (self.z * _rhs.y),
             y: (self.z * _rhs.x) - (self.x * _rhs.z),
@@ -131,7 +131,7 @@ impl Vec3 {
 
     #[allow(dead_code)]
     pub fn unit_vector(&self) -> Vec3 {
-        self / self.len()
+        *self / self.len()
     }
 
     #[allow(dead_code)]
@@ -166,9 +166,9 @@ impl ops::DivAssign<f64> for Vec3 {
     }
 }
 
-impl ops::Add for &Vec3 {
+impl ops::Add for Vec3 {
     type Output = Vec3;
-    fn add(self, _rhs: &Vec3) -> Vec3 {
+    fn add(self, _rhs: Vec3) -> Vec3 {
         Vec3 {
             x: self.x + _rhs.x,
             y: self.y + _rhs.y,
@@ -177,7 +177,7 @@ impl ops::Add for &Vec3 {
     }
 }
 
-impl ops::Add<f64> for &Vec3 {
+impl ops::Add<f64> for Vec3 {
     type Output = Vec3;
     fn add(self, _rhs: f64) -> Vec3 {
         Vec3 {
@@ -199,18 +199,7 @@ impl ops::Sub for Vec3 {
     }
 }
 
-impl ops::Sub for &Vec3 {
-    type Output = Vec3;
-    fn sub(self, _rhs: &Vec3) -> Vec3 {
-        Vec3 {
-            x: self.x - _rhs.x,
-            y: self.y - _rhs.y,
-            z: self.z - _rhs.z,
-        }
-    }
-}
-
-impl ops::Div<f64> for &Vec3 {
+impl ops::Div<f64> for Vec3 {
     type Output = Vec3;
     fn div(self, _rhs: f64) -> Vec3 {
         Vec3 {
@@ -221,7 +210,7 @@ impl ops::Div<f64> for &Vec3 {
     }
 }
 
-impl ops::Mul<f64> for &Vec3 {
+impl ops::Mul<f64> for Vec3 {
     type Output = Vec3;
     fn mul(self, _rhs: f64) -> Vec3 {
         Vec3 {
@@ -232,9 +221,9 @@ impl ops::Mul<f64> for &Vec3 {
     }
 }
 
-impl ops::Mul for &Vec3 {
+impl ops::Mul for Vec3 {
     type Output = Vec3;
-    fn mul(self, _rhs: &Vec3) -> Vec3 {
+    fn mul(self, _rhs: Vec3) -> Vec3 {
         Vec3 {
             x: self.x * _rhs.x,
             y: self.y * _rhs.y,
@@ -243,7 +232,7 @@ impl ops::Mul for &Vec3 {
     }
 }
 
-impl ops::Neg for &Vec3 {
+impl ops::Neg for Vec3 {
     type Output = Vec3;
     fn neg(self) -> Self::Output {
         Vec3 {

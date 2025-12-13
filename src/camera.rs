@@ -93,7 +93,7 @@ impl Camera {
                     let ray = self.get_ray(i, j);
                     pixel_color += Self::ray_color(&ray, self.max_depth, world);
                 }
-                write_color(&(&pixel_color * self.pixel_samples_scale));
+                write_color(&(pixel_color * self.pixel_samples_scale));
             }
         }
     }
@@ -118,28 +118,28 @@ impl Camera {
         let viewport_width = viewport_height * (self.image_width as f64 / self.image_height as f64);
 
         // Calculate the u,v,w unit basis vectors for the camera coordinate frame
-        self.w = (&self.lookfrom - &self.lookat).unit_vector();
-        self.u = self.vup.cross(&self.w).unit_vector();
-        self.v = self.w.cross(&self.u);
+        self.w = (self.lookfrom - self.lookat).unit_vector();
+        self.u = self.vup.cross(self.w).unit_vector();
+        self.v = self.w.cross(self.u);
 
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
-        let viewport_u = &self.u * viewport_width;
-        let viewport_v = &-&self.v * viewport_height;
+        let viewport_u = self.u * viewport_width;
+        let viewport_v = -self.v * viewport_height;
 
         // Calculate the horizontal and vertical delta vectors from pixel to pixel.
-        self.pixel_delta_u = &viewport_u / self.image_width as f64;
-        self.pixel_delta_v = &viewport_v / self.image_height as f64;
+        self.pixel_delta_u = viewport_u / self.image_width as f64;
+        self.pixel_delta_v = viewport_v / self.image_height as f64;
 
         // Calculate the location of the upper left pixel.
         let viewport_upper_left =
-            &self.center - &(&self.w * self.focus_dist) - (&viewport_u / 2.0) - (&viewport_v / 2.0);
+            self.center - (self.w * self.focus_dist) - (viewport_u / 2.0) - (viewport_v / 2.0);
         self.pixel00_loc =
-            &viewport_upper_left + &(&(&self.pixel_delta_u + &self.pixel_delta_v) * 0.5);
+            viewport_upper_left + ((self.pixel_delta_u + self.pixel_delta_v) * 0.5);
 
             // Calculate the camera defocus disk basis vectors
         let defocus_radius = self.focus_dist * degrees_to_radians(self.defocus_angle/2.0).tan();
-        self.defocus_disk_u = &self.u * defocus_radius;
-        self.defocus_disk_v = &self.v * defocus_radius;
+        self.defocus_disk_u = self.u * defocus_radius;
+        self.defocus_disk_v = self.v * defocus_radius;
     }
 
     fn sample_square() -> Vec3 {
@@ -149,7 +149,7 @@ impl Camera {
     fn defocus_disk_sample(&self) -> Point3 {
         // Returns a random point in the camera defocus disk
         let p = Vec3::random_in_unit_disk();
-        &self.center + &(&(&self.defocus_disk_u * p.x()) + &(&self.defocus_disk_v * p.y()))
+        self.center + ((self.defocus_disk_u * p.x()) + (self.defocus_disk_v * p.y()))
     }
 
     fn get_ray(&self, i: i32, j: i32) -> Ray {
@@ -157,16 +157,16 @@ impl Camera {
         // sampled point around the pixel location i, j
 
         let offset = Self::sample_square();
-        let pixel_sample = &self.pixel00_loc
-            + &(&(&self.pixel_delta_u * (i as f64 + offset.x()) as f64)
-                + &(&self.pixel_delta_v * (j as f64 + offset.y()) as f64));
+        let pixel_sample = self.pixel00_loc
+            + ((self.pixel_delta_u * (i as f64 + offset.x()) as f64)
+                + (self.pixel_delta_v * (j as f64 + offset.y()) as f64));
 
         let ray_origin = if self.defocus_angle <= 0.0 {
-            &self.center
+            self.center
         } else {
-            &self.defocus_disk_sample()
+            self.defocus_disk_sample()
         };
-        let ray_direction = &pixel_sample - ray_origin;
+        let ray_direction = pixel_sample - ray_origin;
 
         Ray::new(&ray_origin, &ray_direction)
     }
@@ -186,7 +186,7 @@ impl Camera {
                 .as_ref()
                 .is_some_and(|mat| mat.scatter(ray, &rec, &mut attenuation, &mut scattered))
             {
-                return &attenuation * &Self::ray_color(&scattered, depth - 1, world);
+                return attenuation * Self::ray_color(&scattered, depth - 1, world);
             }
             return Color::new(0.0, 0.0, 0.0);
         }
@@ -194,6 +194,6 @@ impl Camera {
         let unit_dir = ray.direction().unit_vector();
         let a = 0.5 * (unit_dir.y() + 1.0);
 
-        &(&Color::new(1.0, 1.0, 1.0) * (1.0 - a)) + &(&Color::new(0.5, 0.7, 1.0) * a)
+        (Color::new(1.0, 1.0, 1.0) * (1.0 - a)) + (Color::new(0.5, 0.7, 1.0) * a)
     }
 }

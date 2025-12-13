@@ -26,13 +26,13 @@ impl HitRecord {
     }
 
     #[allow(dead_code)]
-    pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: &Vec3) {
+    pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vec3) {
         // Sets the hit record normal vector
         // NOTE: the parameter `outward_normal` is assumed to have unit length
 
         self.front_face = Vec3::dot(ray.direction(), outward_normal) < 0.0;
         self.normal = if self.front_face {
-            outward_normal.clone()
+            outward_normal
         } else {
             outward_normal * -1.0
         };

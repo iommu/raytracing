@@ -38,7 +38,7 @@ impl Material for Lambertian {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        let scatter_direction = &rec.normal + &Vec3::random_unit_vector();
+        let scatter_direction = rec.normal + Vec3::random_unit_vector();
         *scattered = Ray::new(&rec.p, &scatter_direction);
         *attenuation = self.albedo.clone();
         return true;
@@ -70,11 +70,11 @@ impl Material for Metal {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        let reflected = &Vec3::reflect(ray_in.direction(), &rec.normal).unit_vector()
-            + &(&Vec3::random_unit_vector() * self.fuzz);
+        let reflected = Vec3::reflect(ray_in.direction(), rec.normal).unit_vector()
+            + (Vec3::random_unit_vector() * self.fuzz);
         *scattered = Ray::new(&rec.p, &reflected);
         *attenuation = self.albedo.clone();
-        return Vec3::dot(scattered.direction(), &rec.normal) > 0.0;
+        return Vec3::dot(scattered.direction(), rec.normal) > 0.0;
     }
 }
 
@@ -115,14 +115,14 @@ impl Material for Dielectric {
         };
 
         let unit_direction = ray_in.direction().unit_vector();
-        let cos_theta = -unit_direction.dot(&rec.normal).min(1.0);
+        let cos_theta = -unit_direction.dot(rec.normal).min(1.0);
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
         let cannot_refract = ri * sin_theta > 1.0;
         let direction = if cannot_refract || Self::reflectance(cos_theta, ri) > random_double() {
-            unit_direction.reflect(&rec.normal)
+            unit_direction.reflect(rec.normal)
         } else {
-            unit_direction.refract(&rec.normal, ri)
+            unit_direction.refract(rec.normal, ri)
         };
 
         *scattered = Ray::new(&rec.p, &direction);

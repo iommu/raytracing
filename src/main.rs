@@ -34,10 +34,10 @@ fn main() {
             let choose_mat = (a + b + 22) as f64 / 44.0;
             let center = Point3::new(a as f64 + 0.9 * 0.5, 0.2, b as f64 + 0.9 * 0.5);
 
-            if (&center - &Point3::new(4.0, 0.2, 0.0)).len() > 0.9 {
+            if (center - Point3::new(4.0, 0.2, 0.0)).len() > 0.9 {
                 let sphere_material: Option<Rc<dyn Material>> = if choose_mat < 0.8 {
                     // Diffuse
-                    let albedo = &Color::random() * &Color::random();
+                    let albedo = Color::random() * Color::random();
                     Some(Rc::new(Lambertian::new(albedo)))
                 } else if choose_mat < 0.95 {
                     // Metal
