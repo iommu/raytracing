@@ -6,15 +6,62 @@ use std::{
 
 use byteorder::{LittleEndian, WriteBytesExt};
 
-use crate::{
-    interval::Interval,
-    vec3::{Color},
-};
+use crate::{interval::Interval, vec3::Color};
 
 pub trait Exporter {
     fn set_dims(&mut self, width: i32, height: i32);
     fn write_header(&mut self) -> io::Result<()>;
     fn write_pixel(&mut self, color: Color) -> io::Result<()>;
+}
+
+#[derive(Debug)]
+pub struct PPMExporter {
+    file: File,
+    width: i32,
+    height: i32,
+}
+
+impl PPMExporter {
+    #[allow(dead_code)]
+    pub fn new<P: AsRef<Path>>(path: P) -> io::Result<Self> {
+        let file = File::create(path)?;
+        Ok(Self {
+            file: file,
+            width: 0,
+            height: 0,
+        })
+    }
+}
+
+impl Exporter for PPMExporter {
+    fn set_dims(&mut self, width: i32, height: i32) {
+        self.width = width;
+        self.height = height;
+    }
+
+    fn write_header(&mut self) -> io::Result<()> {
+        let file = &mut self.file;
+
+        // Header
+        file.write_fmt(format_args!("P3\n{} {}\n255\n", self.width, self.height))?;
+
+        Ok(())
+    }
+
+    fn write_pixel(&mut self, color: Color) -> io::Result<()> {
+        let file = &mut self.file;
+
+        // Translate the [0,1] component values to the byte range [0,255]
+        let intensity = Interval::new(0.0, 0.999);
+        let ir = (255.999 * intensity.clamp(color.x())) as i64;
+        let ig = (255.999 * intensity.clamp(color.y())) as i64;
+        let ib = (255.999 * intensity.clamp(color.z())) as i64;
+
+        // Write out the pixel color components
+        file.write_fmt(format_args!("{ir} {ig} {ib}\n"))?;
+
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
@@ -25,6 +72,7 @@ pub struct BMPExporter {
 }
 
 impl BMPExporter {
+    #[allow(dead_code)]
     pub fn new<P: AsRef<Path>>(path: P) -> io::Result<Self> {
         let file = File::create(path)?;
         Ok(Self {
@@ -33,8 +81,8 @@ impl BMPExporter {
             height: 0,
         })
     }
-
 }
+
 impl Exporter for BMPExporter {
     fn set_dims(&mut self, width: i32, height: i32) {
         self.width = width;
