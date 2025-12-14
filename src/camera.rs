@@ -139,7 +139,7 @@ impl Camera {
     fn defocus_disk_sample(&self) -> Point3 {
         // Returns a random point in the camera defocus disk
         let p = Vec3::random_in_unit_disk();
-        self.center + ((self.defocus_disk_u * p.x()) + (self.defocus_disk_v * p.y()))
+        self.center + ((self.defocus_disk_u * p.x) + (self.defocus_disk_v * p.y))
     }
 
     fn get_ray(&self, i: i32, j: i32) -> Ray {
@@ -148,8 +148,8 @@ impl Camera {
 
         let offset = Self::sample_square();
         let pixel_sample = self.pixel00_loc
-            + ((self.pixel_delta_u * (i as f64 + offset.x()) as f64)
-                + (self.pixel_delta_v * (j as f64 + offset.y()) as f64));
+            + ((self.pixel_delta_u * (i as f64 + offset.x) as f64)
+                + (self.pixel_delta_v * (j as f64 + offset.y) as f64));
 
         let ray_origin = if self.defocus_angle <= 0.0 {
             self.center
@@ -158,7 +158,7 @@ impl Camera {
         };
         let ray_direction = pixel_sample - ray_origin;
 
-        Ray::new(ray_origin, ray_direction)
+        Ray::new_no_time(ray_origin, ray_direction)
     }
 
     fn ray_color<T: Hittable>(ray: &Ray, depth: i32, world: &T) -> Color {
@@ -181,16 +181,16 @@ impl Camera {
             return Color::new(0.0, 0.0, 0.0);
         }
 
-        let unit_dir = ray.direction().unit_vector();
-        let a = 0.5 * (unit_dir.y() + 1.0);
+        let unit_dir = ray.dir.unit_vector();
+        let a = 0.5 * (unit_dir.y + 1.0);
 
         (Color::new(1.0, 1.0, 1.0) * (1.0 - a)) + (Color::new(0.5, 0.7, 1.0) * a)
     }
 
     fn write_color(&mut self, color: &Color) {
-        let mut r = color.x();
-        let mut g = color.y();
-        let mut b = color.z();
+        let mut r = color.x;
+        let mut g = color.y;
+        let mut b = color.z;
 
         // Apply a linear to gamma transform for gamma 2
         r = linear_to_gamma(r);

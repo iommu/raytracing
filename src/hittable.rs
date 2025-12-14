@@ -24,7 +24,7 @@ impl HitRecord {
         // Sets the hit record normal vector
         // NOTE: the parameter `outward_normal` is assumed to have unit length
 
-        self.front_face = Vec3::dot(ray.direction(), outward_normal) < 0.0;
+        self.front_face = Vec3::dot(&ray.dir, outward_normal) < 0.0;
         self.normal = if self.front_face {
             outward_normal
         } else {

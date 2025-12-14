@@ -21,9 +21,9 @@ impl Sphere {}
 
 impl Hittable for Sphere {
     fn hit(&self, ray: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
-        let oc = self.center - *ray.origin();
-        let a = ray.direction().len_squared();
-        let h = Vec3::dot(ray.direction(), oc);
+        let oc = self.center - ray.origin;
+        let a = ray.dir.len_squared();
+        let h = Vec3::dot(&ray.dir, oc);
         let c = oc.len_squared() - self.radius * self.radius;
         //
         let discriminant = h * h - a * c;

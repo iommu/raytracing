@@ -6,9 +6,9 @@ use crate::utils::{random_double, random_double_range};
 
 #[derive(Debug, Clone, Copy, New, Default)]
 pub struct Vec3 {
-    x: f64,
-    y: f64,
-    z: f64,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl Vec3 {
@@ -76,21 +76,6 @@ impl Vec3 {
         let ray_out_perp = (*self + (n * cos_theta)) * etai_over_etat;
         let ray_out_para = n * ((1.0 - ray_out_perp.len_squared()).abs().sqrt() * -1.0);
         ray_out_perp + ray_out_para
-    }
-
-    #[allow(dead_code)]
-    pub fn x(&self) -> f64 {
-        self.x
-    }
-
-    #[allow(dead_code)]
-    pub fn y(&self) -> f64 {
-        self.y
-    }
-
-    #[allow(dead_code)]
-    pub fn z(&self) -> f64 {
-        self.z
     }
 
     #[allow(dead_code)]
