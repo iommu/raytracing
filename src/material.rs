@@ -38,7 +38,7 @@ impl Material for Lambertian {
     ) -> bool {
         let scatter_direction = rec.normal + Vec3::random_unit_vector();
         *scattered = Ray::new(rec.p, scatter_direction, ray_in.time);
-        *attenuation = self.albedo.clone();
+        *attenuation = self.albedo;
         return true;
     }
 }
@@ -71,7 +71,7 @@ impl Material for Metal {
         let reflected = Vec3::reflect(&ray_in.dir, rec.normal).unit_vector()
             + (Vec3::random_unit_vector() * self.fuzz);
         *scattered = Ray::new(rec.p, reflected, ray_in.time);
-        *attenuation = self.albedo.clone();
+        *attenuation = self.albedo;
         return Vec3::dot(&scattered.dir, rec.normal) > 0.0;
     }
 }

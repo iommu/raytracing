@@ -5,23 +5,23 @@ use derive_new::new as New;
 use crate::{
     hittable::{HitRecord, Hittable},
     interval::Interval,
-    material::Material,
+    material::{Dielectric, Lambertian, Material},
     ray::Ray,
-    vec3::{Point3, Vec3},
+    vec3::{Color, Point3, Vec3},
 };
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct Sphere {
     center: Ray,
     radius: f64,
-    mat: Option<Rc<dyn Material>>,
+    mat: Rc<dyn Material>,
 }
 
 impl Sphere {
     pub fn new_stationary(
         static_center: Point3,
         radius: f64,
-        mat: Option<Rc<dyn Material>>,
+        mat: Rc<dyn Material>,
     ) -> Sphere {
         Sphere {
             center: Ray::new_no_time(static_center, Vec3::default()),
@@ -34,7 +34,7 @@ impl Sphere {
         center_1: Point3,
         center_2: Point3,
         radius: f64,
-        mat: Option<Rc<dyn Material>>,
+        mat: Rc<dyn Material>,
     ) -> Sphere {
         Sphere {
             center: Ray::new_no_time(center_1, center_2 - center_1),
@@ -72,7 +72,8 @@ impl Hittable for Sphere {
         rec.p = ray.at(rec.t);
         let outward_normal = (rec.p - current_center) / self.radius;
         rec.set_face_normal(ray, outward_normal);
-        rec.mat = self.mat.clone();
+        
+        rec.mat = Some(self.mat.clone());
 
         return true;
     }

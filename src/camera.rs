@@ -97,7 +97,7 @@ impl Camera {
 
         self.pixel_samples_scale = 1.0 / self.samples_per_pixel as f64;
 
-        self.center = self.lookfrom.clone();
+        self.center = self.lookfrom;
 
         // Determine viewport dimensions
         let theta = degrees_to_radians(self.vfov);

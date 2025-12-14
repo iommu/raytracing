@@ -25,8 +25,8 @@ fn main() -> io::Result<()> {
     let mut world = HittableList::new();
 
     // World setup
-    let material_ground: Option<Rc<dyn Material>> =
-        Some(Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5))));
+    let material_ground: Rc<dyn Material> =
+        Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
 
     world.add(Box::new(Sphere::new_stationary(
         Vec3::new(0.0, -1000.0, 0.0),
@@ -48,16 +48,16 @@ fn main() -> io::Result<()> {
                         center,
                         center_2,
                         0.2,
-                        Some(Rc::new(Lambertian::new(albedo))),
+                        Rc::new(Lambertian::new(albedo)),
                     )
                 } else if choose_mat < 0.95 {
                     // Metal
                     let albedo = Color::random_from_range(0.5, 1.0);
                     let fuzz = 0.5;
-                    Sphere::new_stationary(center, 0.2, Some(Rc::new(Metal::new(albedo, fuzz))))
+                    Sphere::new_stationary(center, 0.2, Rc::new(Metal::new(albedo, fuzz)))
                 } else {
                     // Glass
-                    Sphere::new_stationary(center, 0.2, Some(Rc::new(Dielectric::new(1.5))))
+                    Sphere::new_stationary(center, 0.2, Rc::new(Dielectric::new(1.5)))
                 };
 
                 world.add(Box::new(sphere));
@@ -65,11 +65,11 @@ fn main() -> io::Result<()> {
         }
     }
 
-    let material_1: Option<Rc<dyn Material>> = Some(Rc::new(Dielectric::new(1.5)));
-    let material_2: Option<Rc<dyn Material>> =
-        Some(Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1))));
-    let material_3: Option<Rc<dyn Material>> =
-        Some(Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0)));
+    let material_1: Rc<dyn Material> = Rc::new(Dielectric::new(1.5));
+    let material_2: Rc<dyn Material> =
+        Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    let material_3: Rc<dyn Material> =
+        Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 
     world.add(Box::new(Sphere::new_stationary(
         Vec3::new(0.0, 1.0, 0.0),
