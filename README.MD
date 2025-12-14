@@ -39,8 +39,8 @@ Profiling was done very crudely with just a simple timer encapsulating the rende
 
 Commit ID : test 1, test 2 
 
-709b4f977a1d9cd440e241b725ee9467432abf36 : 15.791569448s, 15.835566534s
+709b4f9 : 15.791569448s, 15.835566534s  
 Notes : completion of tutorial, first attempt
 
-bcdd4bdcabc0cb8c99bdcb95715b79b2b5a36c1d : 15.612361624s, 15.644525864s
+bcdd4bd : 15.612361624s, 15.644525864s  
 Notes : implmented Copy trait and turned Vec3 opterations &Vec3 to Vec3. Speed difference negledgeable, but code readability improved 
