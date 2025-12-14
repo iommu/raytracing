@@ -157,8 +157,9 @@ impl Camera {
             self.defocus_disk_sample()
         };
         let ray_direction = pixel_sample - ray_origin;
+        let ray_time = random_double();
 
-        Ray::new_no_time(ray_origin, ray_direction)
+        Ray::new(ray_origin, ray_direction, ray_time)
     }
 
     fn ray_color<T: Hittable>(ray: &Ray, depth: i32, world: &T) -> Color {

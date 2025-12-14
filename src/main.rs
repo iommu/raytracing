@@ -12,11 +12,12 @@ use std::time::Instant;
 use std::{io, rc::Rc};
 
 use camera::Camera;
+use exporter::{BMPExporter, Exporter};
 use hittable::HittableList;
 use material::{Dielectric, Lambertian, Material, Metal};
 use sphere::Sphere;
 use vec3::{Color, Point3, Vec3};
-use exporter::{BMPExporter, Exporter};
+use utils::{random_double, random_double_range};
 
 fn main() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
@@ -25,9 +26,9 @@ fn main() -> io::Result<()> {
 
     // World setup
     let material_ground: Option<Rc<dyn Material>> =
-        Some(Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0))));
+        Some(Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5))));
 
-    world.add(Box::new(Sphere::new(
+    world.add(Box::new(Sphere::new_stationary(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
         material_ground,
@@ -39,21 +40,27 @@ fn main() -> io::Result<()> {
             let center = Point3::new(a as f64 + 0.9 * 0.5, 0.2, b as f64 + 0.9 * 0.5);
 
             if (center - Point3::new(4.0, 0.2, 0.0)).len() > 0.9 {
-                let sphere_material: Option<Rc<dyn Material>> = if choose_mat < 0.8 {
+                let sphere = if choose_mat < 0.8 {
                     // Diffuse
                     let albedo = Color::random() * Color::random();
-                    Some(Rc::new(Lambertian::new(albedo)))
+                    let center_2 = center + Vec3::new(0.0, random_double_range(0.0, 0.5), 0.0);
+                    Sphere::new_moving(
+                        center,
+                        center_2,
+                        0.2,
+                        Some(Rc::new(Lambertian::new(albedo))),
+                    )
                 } else if choose_mat < 0.95 {
                     // Metal
                     let albedo = Color::random_from_range(0.5, 1.0);
                     let fuzz = 0.5;
-                    Some(Rc::new(Metal::new(albedo, fuzz)))
+                    Sphere::new_stationary(center, 0.2, Some(Rc::new(Metal::new(albedo, fuzz))))
                 } else {
                     // Glass
-                    Some(Rc::new(Dielectric::new(1.5)))
+                    Sphere::new_stationary(center, 0.2, Some(Rc::new(Dielectric::new(1.5))))
                 };
 
-                world.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                world.add(Box::new(sphere));
             }
         }
     }
@@ -64,17 +71,17 @@ fn main() -> io::Result<()> {
     let material_3: Option<Rc<dyn Material>> =
         Some(Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0)));
 
-    world.add(Box::new(Sphere::new(
+    world.add(Box::new(Sphere::new_stationary(
         Vec3::new(0.0, 1.0, 0.0),
         1.0,
         material_1,
     )));
-    world.add(Box::new(Sphere::new(
+    world.add(Box::new(Sphere::new_stationary(
         Vec3::new(-4.0, 1.0, 0.0),
         1.0,
         material_2,
     )));
-    world.add(Box::new(Sphere::new(
+    world.add(Box::new(Sphere::new_stationary(
         Vec3::new(4.0, 1.0, 0.0),
         1.0,
         material_3,
