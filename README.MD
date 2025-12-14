@@ -1,6 +1,6 @@
 # Rust raytracer
 
-Based off of the excellent ("Ray Tracing in One Weekend")[https://raytracing.github.io/books/RayTracingInOneWeekend.html] tutorial but with some extra changes.
+Based off of the excellent ["Ray Tracing in One Weekend"](https://raytracing.github.io/books/RayTracingInOneWeekend.html) tutorial but with some extra changes.
 
 This isn't anything special, it's just a demo project for learning :)
 
