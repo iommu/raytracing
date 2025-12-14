@@ -37,7 +37,7 @@ Profiling was done very crudely with just a simple timer encapsulating the rende
 * Samples and image size was turned down heavily 
 * Image data was piped to /dev/null
 
-Commit ID : test 1, test 2 
+Commit ID : test 1, test 2  
 [709b4f9](/../../commit/709b4f9) : 15.791569448s, 15.835566534s  
 Notes : completion of tutorial, first attempt
 
