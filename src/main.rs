@@ -16,7 +16,7 @@ use hittable::HittableList;
 use material::{Dielectric, Lambertian, Material, Metal};
 use sphere::Sphere;
 use vec3::{Color, Point3, Vec3};
-use exporter::{BMPExporter, PPMExporter, Exporter};
+use exporter::{BMPExporter, Exporter};
 
 fn main() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
