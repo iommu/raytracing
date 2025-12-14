@@ -131,9 +131,9 @@ impl Exporter for BMPExporter {
         let b = (255.999 * intensity.clamp(color.z)) as u8;
 
         // Write out the pixel color components
-        file.write_u8(r)?;
-        file.write_u8(g)?;
         file.write_u8(b)?;
+        file.write_u8(g)?;
+        file.write_u8(r)?;
 
         Ok(())
     }
