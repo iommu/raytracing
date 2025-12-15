@@ -1,4 +1,4 @@
-use std::ops;
+use std::ops::{self, Index};
 
 use derive_new::new as New;
 
@@ -212,6 +212,18 @@ impl ops::Neg for Vec3 {
             x: -self.x,
             y: -self.y,
             z: -self.z,
+        }
+    }
+}
+
+impl Index<usize> for Vec3 {
+    type Output = f64;
+    fn index(&self, index: usize) -> &Self::Output {
+        assert!(index < 3, "Index out of bounds!"); // Bounds check
+        match index {
+            0 => &self.x,
+            1 => &self.y,
+            _ => &self.z
         }
     }
 }

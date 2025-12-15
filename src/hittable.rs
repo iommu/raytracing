@@ -3,6 +3,7 @@ use std::rc::Rc;
 use derive_new::new as New;
 
 use crate::{
+    aabb::AABB,
     interval::Interval,
     material::Material,
     ray::Ray,
@@ -35,18 +36,22 @@ impl HitRecord {
 
 pub trait Hittable {
     fn hit(&self, ray: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool;
+
+    fn bounding_box(&self) -> AABB;
 }
 
+#[derive(Default, Clone)]
 pub struct HittableList {
-    objects: Vec<Box<dyn Hittable>>,
+    pub objects: Vec<Rc<dyn Hittable>>,
+    bbox: AABB,
 }
 
 impl HittableList {
     #[allow(dead_code)]
-    pub fn new() -> HittableList {
-        HittableList {
-            objects: Vec::new(),
-        }
+    pub fn new(object: Rc<dyn Hittable>) -> Self {
+        let mut list = Self::default();
+        list.add(object);
+        list
     }
 
     #[allow(dead_code)]
@@ -55,7 +60,8 @@ impl HittableList {
     }
 
     #[allow(dead_code)]
-    pub fn add(&mut self, object: Box<dyn Hittable>) {
+    pub fn add(&mut self, object: Rc<dyn Hittable>) {
+        self.bbox = AABB::from_aabbs(self.bbox, object.bounding_box());
         self.objects.push(object);
     }
 }
@@ -73,5 +79,9 @@ impl Hittable for HittableList {
         }
 
         hit_anything
+    }
+
+    fn bounding_box(&self) -> AABB {
+        self.bbox
     }
 }

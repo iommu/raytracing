@@ -3,6 +3,7 @@ use std::rc::Rc;
 use derive_new::new as New;
 
 use crate::{
+    aabb::AABB,
     hittable::{HitRecord, Hittable},
     interval::Interval,
     material::{Dielectric, Lambertian, Material},
@@ -15,18 +16,18 @@ pub struct Sphere {
     center: Ray,
     radius: f64,
     mat: Rc<dyn Material>,
+    bbox: AABB,
 }
 
 impl Sphere {
-    pub fn new_stationary(
-        static_center: Point3,
-        radius: f64,
-        mat: Rc<dyn Material>,
-    ) -> Sphere {
+    pub fn new_stationary(static_center: Point3, radius: f64, mat: Rc<dyn Material>) -> Sphere {
+        let radius = radius.max(0.0);
+        let rvec = Vec3::new(radius, radius, radius);
         Sphere {
             center: Ray::new_no_time(static_center, Vec3::default()),
-            radius: radius.max(0.0),
+            radius: radius,
             mat: mat,
+            bbox: AABB::from_points(static_center - rvec, static_center + rvec),
         }
     }
 
@@ -36,10 +37,17 @@ impl Sphere {
         radius: f64,
         mat: Rc<dyn Material>,
     ) -> Sphere {
+        let radius = radius.max(0.0);
+        let center = Ray::new_no_time(center_1, center_2 - center_1);
+        let rvec = Vec3::new(radius, radius, radius);
         Sphere {
-            center: Ray::new_no_time(center_1, center_2 - center_1),
-            radius: radius.max(0.0),
+            center: center,
+            radius: radius,
             mat: mat,
+            bbox: AABB::from_aabbs(
+                AABB::from_points(center.at(0.0) - rvec, center.at(0.0) + rvec),
+                AABB::from_points(center.at(1.0) - rvec, center.at(1.0) + rvec),
+            ),
         }
     }
 }
@@ -76,5 +84,9 @@ impl Hittable for Sphere {
         rec.mat = Some(self.mat.clone());
 
         return true;
+    }
+
+    fn bounding_box(&self) -> AABB {
+        self.bbox
     }
 }
