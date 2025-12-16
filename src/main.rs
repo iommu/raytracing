@@ -6,6 +6,7 @@ mod exporter;
 mod hittable;
 mod interval;
 mod material;
+mod perlin;
 mod ray;
 mod rtw_image;
 mod sphere;
@@ -25,7 +26,44 @@ use sphere::Sphere;
 use utils::{random_double, random_double_range};
 use vec3::{Color, Point3, Vec3};
 
-use crate::texture::{CheckerTexture, ImageTexture, Texture};
+use crate::texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
+
+fn perlin_spheres() -> io::Result<()> {
+    let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
+    let mut world = HittableList::default();
+
+    let pertext = Rc::new(NoiseTexture::new(4.0)) as Rc<dyn Texture>;
+
+    world.add(Rc::new(Sphere::new_stationary(
+        Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Rc::new(Lambertian::new(pertext.clone())),
+    )));
+
+    world.add(Rc::new(Sphere::new_stationary(
+        Vec3::new(0.0, 2.0, 0.0),
+        2.0,
+        Rc::new(Lambertian::new(pertext)),
+    )));
+
+    let mut camera = Camera::from_exporter(exporter);
+    camera.aspect_ratio = 16.0 / 9.0;
+    camera.image_width = 400;
+    camera.samples_per_pixel = 10;
+    camera.max_depth = 10;
+
+    camera.vfov = 20.0;
+    camera.lookfrom = Point3::new(13.0, 2.0, 3.0);
+    camera.lookat = Point3::new(0.0, 0.0, 0.0);
+    camera.vup = Vec3::new(0.0, 1.0, 0.0);
+
+    camera.defocus_angle = 0.0;
+
+    // Render
+    camera.render(&world);
+
+    Ok(())
+}
 
 fn earth() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
@@ -153,5 +191,6 @@ fn bouncing() -> io::Result<()> {
 }
 
 fn main() -> io::Result<()> {
-    earth()
+    perlin_spheres()
+    // earth()
 }
