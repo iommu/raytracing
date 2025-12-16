@@ -1,14 +1,12 @@
 use std::{f64::consts::PI, rc::Rc};
 
-use derive_new::new as New;
-
 use crate::{
     aabb::AABB,
     hittable::{HitRecord, Hittable},
     interval::Interval,
-    material::{Dielectric, Lambertian, Material},
+    material::Material,
     ray::Ray,
-    vec3::{Color, Point3, Vec3},
+    vec3::{Point3, Vec3},
 };
 
 #[derive(Clone)]
@@ -20,6 +18,7 @@ pub struct Sphere {
 }
 
 impl Sphere {
+    #[allow(dead_code)]
     pub fn new_stationary(static_center: Point3, radius: f64, mat: Rc<dyn Material>) -> Sphere {
         let radius = radius.max(0.0);
         let rvec = Vec3::new(radius, radius, radius);
@@ -31,6 +30,7 @@ impl Sphere {
         }
     }
 
+    #[allow(dead_code)]
     pub fn new_moving(
         center_1: Point3,
         center_2: Point3,
@@ -51,7 +51,8 @@ impl Sphere {
         }
     }
 
-    pub fn get_uv(point : Point3, u : &mut f64, v : &mut f64) {
+    #[allow(dead_code)]
+    fn get_uv(point: Point3, u: &mut f64, v: &mut f64) {
         // p: a given point on the sphere of radius one, centered at the origin.
         // u: returned value [0,1] of angle around the Y axis from X=-1.
         // v: returned value [0,1] of angle from Y=-1 to Y=+1.
@@ -63,7 +64,7 @@ impl Sphere {
         let phi = f64::atan2(-(point.z), point.x) + PI;
 
         *u = phi / (2.0 * PI);
-        *v =  theta / PI;
+        *v = theta / PI;
     }
 }
 
@@ -95,7 +96,7 @@ impl Hittable for Sphere {
         rec.p = ray.at(rec.t);
         let outward_normal = (rec.p - current_center) / self.radius;
         rec.set_face_normal(ray, outward_normal);
-        
+
         rec.mat = Some(self.mat.clone());
         Self::get_uv(outward_normal, &mut rec.u, &mut rec.v);
         return true;

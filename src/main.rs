@@ -1,3 +1,4 @@
+// #![allow(dead_code, unused_variables, unused_imports)]
 mod aabb;
 mod bvh;
 mod camera;
@@ -6,11 +7,11 @@ mod hittable;
 mod interval;
 mod material;
 mod ray;
+mod rtw_image;
 mod sphere;
 mod texture;
 mod utils;
 mod vec3;
-mod rtw_image;
 
 use std::time::Instant;
 use std::{io, rc::Rc};
@@ -31,7 +32,11 @@ fn earth() -> io::Result<()> {
     let mut world = HittableList::default();
     let earth_texture = Rc::new(ImageTexture::new("earthmap.jpg")) as Rc<dyn Texture>;
     let earth_surface = Rc::new(Lambertian::new(earth_texture)) as Rc<dyn Material>;
-    let globe = Rc::new(Sphere::new_stationary(Point3::default(), 2.0, earth_surface));
+    let globe = Rc::new(Sphere::new_stationary(
+        Point3::default(),
+        2.0,
+        earth_surface,
+    ));
     world.add(globe);
 
     let mut camera = Camera::from_exporter(exporter);
@@ -61,11 +66,9 @@ fn bouncing() -> io::Result<()> {
     // World setup
     let material_ground: Rc<dyn Material> =
         Rc::new(Lambertian::from_color(Color::new(0.5, 0.5, 0.5)));
-    let material_checker: Rc<dyn Material> = Rc::new(Lambertian::new(Rc::new(CheckerTexture::from_colors(
-        0.32,
-        Color::new(0.2, 0.3, 0.1),
-        Color::new(0.9, 0.9, 0.9),
-    ))));
+    let material_checker: Rc<dyn Material> = Rc::new(Lambertian::new(Rc::new(
+        CheckerTexture::from_colors(0.32, Color::new(0.2, 0.3, 0.1), Color::new(0.9, 0.9, 0.9)),
+    )));
 
     world.add(Rc::new(Sphere::new_stationary(
         Vec3::new(0.0, -1000.0, 0.0),

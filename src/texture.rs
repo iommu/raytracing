@@ -1,4 +1,4 @@
-use std::{path::Path, rc::Rc};
+use std::rc::Rc;
 
 use crate::{
     interval::Interval,
@@ -86,13 +86,11 @@ impl ImageTexture {
             image: RTWImage::new(path).unwrap(),
         }
     }
-
-    
 }
 
 impl Texture for ImageTexture {
-#[allow(dead_code)]
-    fn value(&self, mut u: f64, mut v: f64, point: Point3) -> Color {
+    #[allow(dead_code)]
+    fn value(&self, mut u: f64, mut v: f64, _point: Point3) -> Color {
         // If we have no texture data, then return solid cyan as a debugging aid
         if self.image.height() <= 0 {
             return Color::new(0.0, 1.0, 1.0);

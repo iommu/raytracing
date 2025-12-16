@@ -1,10 +1,9 @@
 use std::{
-    alloc::{self, Layout, alloc, dealloc},
+    alloc::{Layout, alloc, dealloc},
     env,
     ffi::CString,
-    io::{self, Error, Write},
+    io::{self, Error},
     ops::{Index, IndexMut},
-    os::{fd, unix::ffi::OsStrExt},
     path::Path,
     str::FromStr,
 };
@@ -176,7 +175,7 @@ impl RTWImage {
 
         let offset = y * self.bytes_per_scanline + x * Self::BYTES_PER_PIXEL;
         let offset_max =
-            self.image_height *  self.bytes_per_scanline + self.image_width * Self::BYTES_PER_PIXEL;
+            self.image_height * self.bytes_per_scanline + self.image_width * Self::BYTES_PER_PIXEL;
 
         let offset = Self::clamp(offset, 0, offset_max - 3) as usize;
         self.bdata.as_ref().unwrap().as_slice()[offset..offset + 3]

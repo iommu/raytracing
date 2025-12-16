@@ -3,7 +3,11 @@ use std::{fmt::Debug, rc::Rc};
 use derive_new::new as New;
 
 use crate::{
-    hittable::HitRecord, ray::Ray, texture::{self, SolidColor, Texture}, utils::random_double, vec3::{Color, Vec3}
+    hittable::HitRecord,
+    ray::Ray,
+    texture::{SolidColor, Texture},
+    utils::random_double,
+    vec3::{Color, Vec3},
 };
 
 pub trait Material {
@@ -24,7 +28,8 @@ pub struct Lambertian {
 }
 
 impl Lambertian {
-    pub fn from_color(albedo : Color) -> Self {
+    #[allow(dead_code)]
+    pub fn from_color(albedo: Color) -> Self {
         Self::new(Rc::new(SolidColor::new(albedo)))
     }
 }
@@ -51,12 +56,11 @@ pub struct Metal {
 }
 
 impl Metal {
+    #[allow(dead_code)]
     pub fn new(albedo: Color, fuzz: f64) -> Metal {
-        let fuzz = if fuzz < 1.0 { fuzz } else { 1.0 };
-
         Metal {
             albedo: albedo,
-            fuzz: fuzz,
+            fuzz: fuzz.min(1.0),
         }
     }
 }
@@ -85,12 +89,14 @@ pub struct Dielectric {
 }
 
 impl Dielectric {
+    #[allow(dead_code)]
     pub fn new(refraction_index: f64) -> Dielectric {
         Dielectric {
             refraction_index: refraction_index,
         }
     }
 
+    #[allow(dead_code)]
     fn reflectance(cosin: f64, refraction_index: f64) -> f64 {
         // Use Schlick's approximation for reflectance.
         let r0 = ((1.0 - refraction_index) / (1.0 + refraction_index)).powi(2);

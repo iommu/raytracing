@@ -16,11 +16,13 @@ pub struct BVHNode {
 }
 
 impl BVHNode {
+    #[allow(dead_code)]
     pub fn from_list(mut list: HittableList) -> Self {
         let len = list.objects.len();
         Self::new(&mut list.objects, 0, len)
     }
 
+    #[allow(dead_code)]
     pub fn new(objects: &mut Vec<Rc<dyn Hittable>>, start: usize, end: usize) -> Self {
         // Build the bounding box of the span of source objects
         let mut bbox = AABB::empty();
@@ -52,6 +54,7 @@ impl BVHNode {
         }
     }
 
+    #[allow(dead_code)]
     fn box_compare(a: &Rc<dyn Hittable>, b: &Rc<dyn Hittable>, axis_index: usize) -> Ordering {
         let a_axis_interval = a.bounding_box()[axis_index];
         let b_axis_interval = b.bounding_box()[axis_index];
@@ -70,7 +73,11 @@ impl Hittable for BVHNode {
         }
 
         let hit_left = self.left.hit(ray, ray_t, rec);
-        let hit_right = self.right.hit(ray, Interval::new(ray_t.min, if hit_left {rec.t} else {ray_t.max}), rec);
+        let hit_right = self.right.hit(
+            ray,
+            Interval::new(ray_t.min, if hit_left { rec.t } else { ray_t.max }),
+            rec,
+        );
 
         hit_left || hit_right
     }

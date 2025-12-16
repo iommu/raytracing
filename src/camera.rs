@@ -38,7 +38,7 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn from_exporter(exporter : Box<dyn Exporter>) -> Camera {
+    pub fn from_exporter(exporter: Box<dyn Exporter>) -> Camera {
         Camera {
             aspect_ratio: 1.0,
             image_width: 100,
@@ -158,7 +158,7 @@ impl Camera {
         };
         let ray_direction = pixel_sample - ray_origin;
         let ray_time = random_double();
-        
+
         Ray::new(ray_origin, ray_direction, ray_time)
     }
 

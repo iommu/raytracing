@@ -223,7 +223,7 @@ impl Index<usize> for Vec3 {
         match index {
             0 => &self.x,
             1 => &self.y,
-            _ => &self.z
+            _ => &self.z,
         }
     }
 }
