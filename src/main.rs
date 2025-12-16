@@ -10,6 +10,7 @@ mod sphere;
 mod texture;
 mod utils;
 mod vec3;
+mod rtw_image;
 
 use std::time::Instant;
 use std::{io, rc::Rc};
@@ -23,7 +24,34 @@ use sphere::Sphere;
 use utils::{random_double, random_double_range};
 use vec3::{Color, Point3, Vec3};
 
-use crate::texture::CheckerTexture;
+use crate::texture::{CheckerTexture, ImageTexture, Texture};
+
+fn earth() -> io::Result<()> {
+    let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
+    let mut world = HittableList::default();
+    let earth_texture = Rc::new(ImageTexture::new("earthmap.jpg")) as Rc<dyn Texture>;
+    let earth_surface = Rc::new(Lambertian::new(earth_texture)) as Rc<dyn Material>;
+    let globe = Rc::new(Sphere::new_stationary(Point3::default(), 2.0, earth_surface));
+    world.add(globe);
+
+    let mut camera = Camera::from_exporter(exporter);
+    camera.aspect_ratio = 16.0 / 9.0;
+    camera.image_width = 400;
+    camera.samples_per_pixel = 10;
+    camera.max_depth = 10;
+
+    camera.vfov = 20.0;
+    camera.lookfrom = Point3::new(0.0, 0.0, 12.0);
+    camera.lookat = Point3::new(0.0, 0.0, 0.0);
+    camera.vup = Vec3::new(0.0, 1.0, 0.0);
+
+    camera.defocus_angle = 0.0;
+
+    // Render
+    camera.render(&world);
+
+    Ok(())
+}
 
 fn bouncing() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
@@ -122,5 +150,5 @@ fn bouncing() -> io::Result<()> {
 }
 
 fn main() -> io::Result<()> {
-    bouncing()
+    earth()
 }

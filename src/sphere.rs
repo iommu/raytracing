@@ -59,8 +59,8 @@ impl Sphere {
         //     <0 1 0> yields <0.50 1.00>       < 0 -1  0> yields <0.50 0.00>
         //     <0 0 1> yields <0.25 0.50>       < 0  0 -1> yields <0.75 0.50>
 
-        let theta = (-point.y).acos();
-        let phi = f64::atan2(-point.z, point.x) + PI;
+        let theta = (-(point.y)).acos();
+        let phi = f64::atan2(-(point.z), point.x) + PI;
 
         *u = phi / (2.0 * PI);
         *v =  theta / PI;
