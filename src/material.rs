@@ -1,15 +1,12 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, rc::Rc};
 
 use derive_new::new as New;
 
 use crate::{
-    hittable::HitRecord,
-    ray::Ray,
-    utils::random_double,
-    vec3::{Color, Vec3},
+    hittable::HitRecord, ray::Ray, texture::{self, SolidColor, Texture}, utils::random_double, vec3::{Color, Vec3}
 };
 
-pub trait Material: Debug {
+pub trait Material {
     fn scatter(
         &self,
         _ray_in: &Ray,
@@ -21,12 +18,16 @@ pub trait Material: Debug {
     }
 }
 
-#[derive(Debug, Clone, Copy, New, Default)]
+#[derive(Clone, New)]
 pub struct Lambertian {
-    pub albedo: Color,
+    pub texture: Rc<dyn Texture>,
 }
 
-impl Lambertian {}
+impl Lambertian {
+    pub fn from_color(albedo : Color) -> Self {
+        Self::new(Rc::new(SolidColor::new(albedo)))
+    }
+}
 
 impl Material for Lambertian {
     fn scatter(
@@ -38,7 +39,7 @@ impl Material for Lambertian {
     ) -> bool {
         let scatter_direction = rec.normal + Vec3::random_unit_vector();
         *scattered = Ray::new(rec.p, scatter_direction, ray_in.time);
-        *attenuation = self.albedo;
+        *attenuation = self.texture.value(rec.u, rec.v, rec.p);
         return true;
     }
 }

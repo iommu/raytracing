@@ -10,12 +10,14 @@ use crate::{
     vec3::{Point3, Vec3},
 };
 
-#[derive(Debug, Clone, New, Default)]
+#[derive(Clone, New, Default)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
     pub mat: Option<Rc<dyn Material>>,
     pub t: f64,
+    pub u: f64,
+    pub v: f64,
     pub front_face: bool,
 }
 

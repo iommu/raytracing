@@ -1,3 +1,5 @@
+mod aabb;
+mod bvh;
 mod camera;
 mod exporter;
 mod hittable;
@@ -5,37 +7,42 @@ mod interval;
 mod material;
 mod ray;
 mod sphere;
+mod texture;
 mod utils;
 mod vec3;
-mod aabb;
-mod bvh;
 
 use std::time::Instant;
 use std::{io, rc::Rc};
 
+use bvh::BVHNode;
 use camera::Camera;
 use exporter::{BMPExporter, Exporter};
 use hittable::HittableList;
 use material::{Dielectric, Lambertian, Material, Metal};
 use sphere::Sphere;
-use vec3::{Color, Point3, Vec3};
 use utils::{random_double, random_double_range};
+use vec3::{Color, Point3, Vec3};
 
-use crate::bvh::BVHNode;
+use crate::texture::CheckerTexture;
 
-fn main() -> io::Result<()> {
+fn bouncing() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
 
     let mut world = HittableList::default();
 
     // World setup
     let material_ground: Rc<dyn Material> =
-        Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+        Rc::new(Lambertian::from_color(Color::new(0.5, 0.5, 0.5)));
+    let material_checker: Rc<dyn Material> = Rc::new(Lambertian::new(Rc::new(CheckerTexture::from_colors(
+        0.32,
+        Color::new(0.2, 0.3, 0.1),
+        Color::new(0.9, 0.9, 0.9),
+    ))));
 
     world.add(Rc::new(Sphere::new_stationary(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
-        material_ground,
+        material_checker,
     )));
 
     // for a in -11..11 {
@@ -70,17 +77,15 @@ fn main() -> io::Result<()> {
     // }
 
     let material_1: Rc<dyn Material> = Rc::new(Dielectric::new(1.5));
-    let material_2: Rc<dyn Material> =
-        Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    let material_3: Rc<dyn Material> =
-        Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
+    let material_2: Rc<dyn Material> = Rc::new(Lambertian::from_color(Color::new(0.4, 0.2, 0.1)));
+    let material_3: Rc<dyn Material> = Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
 
     world.add(Rc::new(Sphere::new_stationary(
         Vec3::new(0.0, 1.0, 0.0),
         1.0,
         material_1,
     )));
-   world.add(Rc::new(Sphere::new_stationary(
+    world.add(Rc::new(Sphere::new_stationary(
         Vec3::new(-4.0, 1.0, 0.0),
         1.0,
         material_2,
@@ -95,8 +100,8 @@ fn main() -> io::Result<()> {
     // Camera setup
     let mut camera = Camera::from_exporter(exporter);
     camera.aspect_ratio = 16.0 / 9.0;
-    camera.image_width = 1200;
-    camera.samples_per_pixel = 40;
+    camera.image_width = 600;
+    camera.samples_per_pixel = 10;
     camera.max_depth = 10;
 
     camera.vfov = 20.0;
@@ -114,4 +119,8 @@ fn main() -> io::Result<()> {
     eprintln!("render time: {:?}", duration);
 
     Ok(())
+}
+
+fn main() -> io::Result<()> {
+    bouncing()
 }

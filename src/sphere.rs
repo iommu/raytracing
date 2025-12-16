@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{f64::consts::PI, rc::Rc};
 
 use derive_new::new as New;
 
@@ -11,7 +11,7 @@ use crate::{
     vec3::{Color, Point3, Vec3},
 };
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Sphere {
     center: Ray,
     radius: f64,
@@ -50,6 +50,21 @@ impl Sphere {
             ),
         }
     }
+
+    pub fn get_uv(point : Point3, u : &mut f64, v : &mut f64) {
+        // p: a given point on the sphere of radius one, centered at the origin.
+        // u: returned value [0,1] of angle around the Y axis from X=-1.
+        // v: returned value [0,1] of angle from Y=-1 to Y=+1.
+        //     <1 0 0> yields <0.50 0.50>       <-1  0  0> yields <0.00 0.50>
+        //     <0 1 0> yields <0.50 1.00>       < 0 -1  0> yields <0.50 0.00>
+        //     <0 0 1> yields <0.25 0.50>       < 0  0 -1> yields <0.75 0.50>
+
+        let theta = (-point.y).acos();
+        let phi = f64::atan2(-point.z, point.x) + PI;
+
+        *u = phi / (2.0 * PI);
+        *v =  theta / PI;
+    }
 }
 
 impl Hittable for Sphere {
@@ -82,7 +97,7 @@ impl Hittable for Sphere {
         rec.set_face_normal(ray, outward_normal);
         
         rec.mat = Some(self.mat.clone());
-
+        Self::get_uv(outward_normal, &mut rec.u, &mut rec.v);
         return true;
     }
 
