@@ -12,9 +12,9 @@ mod ray;
 mod rtw_image;
 mod sphere;
 mod texture;
+mod tri;
 mod utils;
 mod vec3;
-mod tri;
 
 use std::time::Instant;
 use std::{io, rc::Rc};
@@ -28,9 +28,64 @@ use sphere::Sphere;
 use utils::{random_double, random_double_range};
 use vec3::{Color, Point3, Vec3};
 
-use crate::quad::{Quad};
+use crate::material::DiffuseLight;
+use crate::quad::Quad;
 use crate::texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
 use crate::tri::Tri;
+
+fn simple_lights() -> io::Result<()> {
+    let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
+    let mut world = HittableList::default();
+
+    // Materials
+    let pertext = Rc::new(Lambertian::new(Rc::new(NoiseTexture::new(4.0)))) as Rc<dyn Material>;
+    let difflight = Rc::new(DiffuseLight::from_color(Color::new(4.0, 4.0, 4.0))) as Rc<dyn Material>;
+
+    // Objects
+    world.add(Rc::new(Sphere::new_stationary (
+        Point3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        pertext.clone(),
+    )));
+    world.add(Rc::new(Sphere::new_stationary (
+        Point3::new(0.0, 2.0, 0.0),
+        2.0,
+        pertext,
+    )));
+
+    // Lights
+    world.add(Rc::new(Quad::new(
+        Point3::new(3.0, 1.0, -2.0),
+        Vec3::new(2.0, 0.0, 0.0),
+        Vec3::new(0.0, 2.0, 0.0),
+        difflight.clone(),
+    )));
+    world.add(Rc::new(Sphere::new_stationary (
+        Point3::new(0.0, 7.0, 0.0),
+        2.0,
+        difflight,
+    )));
+
+
+    let mut camera = Camera::from_exporter(exporter);
+    camera.aspect_ratio = 16.0/9.0;
+    camera.image_width = 800;
+    camera.samples_per_pixel = 100;
+    camera.max_depth = 10;
+    camera.background = Color::new(0.0, 0.0, 0.00);
+
+    camera.vfov = 20.0;
+    camera.lookfrom = Point3::new(26.0, 3.0, 6.0);
+    camera.lookat = Point3::new(0.0, 2.0, 0.0);
+    camera.vup = Vec3::new(0.0, 1.0, 0.0);
+
+    camera.defocus_angle = 0.0;
+
+    // Render
+    camera.render(&world);
+
+    Ok(())
+}
 
 fn quads() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
@@ -83,6 +138,7 @@ fn quads() -> io::Result<()> {
     camera.image_width = 400;
     camera.samples_per_pixel = 10;
     camera.max_depth = 10;
+    camera.background = Color::new(0.7, 0.8, 1.00);
 
     camera.vfov = 80.0;
     camera.lookfrom = Point3::new(0.0, 0.0, 9.0);
@@ -260,7 +316,8 @@ fn bouncing() -> io::Result<()> {
 }
 
 fn main() -> io::Result<()> {
-    quads()
+    simple_lights()
+    // quads()
     // perlin_spheres()
     // earth()
 }

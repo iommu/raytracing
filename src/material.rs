@@ -5,9 +5,9 @@ use derive_new::new as New;
 use crate::{
     hittable::HitRecord,
     ray::Ray,
-    texture::{SolidColor, Texture},
+    texture::{self, SolidColor, Texture},
     utils::random_double,
-    vec3::{Color, Vec3},
+    vec3::{Color, Point3, Vec3},
 };
 
 pub trait Material {
@@ -19,6 +19,10 @@ pub trait Material {
         _scattered: &mut Ray,
     ) -> bool {
         return false;
+    }
+
+    fn emitted(&self, u : f64, v : f64, point : Point3) -> Color {
+        return Color::new(0.0, 0.0, 0.0);
     }
 }
 
@@ -132,5 +136,23 @@ impl Material for Dielectric {
 
         *scattered = Ray::new(rec.p, direction, ray_in.time);
         return true;
+    }
+}
+
+#[derive(Clone, New)]
+pub struct DiffuseLight {
+    pub texture: Rc<dyn Texture>,
+}
+
+impl DiffuseLight {
+    #[allow(dead_code)]
+    pub fn from_color(albedo: Color) -> Self {
+        Self::new(Rc::new(SolidColor::new(albedo)))
+    }
+}
+
+impl Material for DiffuseLight {
+    fn emitted(&self, u : f64, v : f64, point : Point3) -> Color {
+        self.texture.value(u, v, point)
     }
 }

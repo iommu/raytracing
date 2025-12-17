@@ -14,6 +14,7 @@ pub struct Camera {
     pub image_width: i32,
     pub samples_per_pixel: i32,
     pub max_depth: i32,
+    pub background: Color,
 
     pub vfov: f64,
     pub lookfrom: Point3,
@@ -44,6 +45,7 @@ impl Camera {
             image_width: 100,
             samples_per_pixel: 10,
             max_depth: 10,
+            background: Color::default(),
             vfov: 90.0,
             lookfrom: Point3::new(0.0, 0.0, 0.0),
             lookat: Point3::new(0.0, 0.0, -1.0),
@@ -77,7 +79,7 @@ impl Camera {
                 let mut pixel_color = Color::default();
                 for _ in 0..self.samples_per_pixel {
                     let ray = self.get_ray(i, j);
-                    pixel_color += Self::ray_color(&ray, self.max_depth, world);
+                    pixel_color += self.ray_color(&ray, self.max_depth, world);
                 }
                 self.write_color(&(pixel_color * self.pixel_samples_scale));
             }
@@ -162,30 +164,32 @@ impl Camera {
         Ray::new(ray_origin, ray_direction, ray_time)
     }
 
-    fn ray_color<T: Hittable>(ray: &Ray, depth: i32, world: &T) -> Color {
+    fn ray_color<T: Hittable>(&self, ray: &Ray, depth: i32, world: &T) -> Color {
         if depth <= 0 {
             return Color::new(0.0, 0.0, 0.0);
         }
 
         let mut rec = HitRecord::default();
 
-        if world.hit(ray, Interval::new(0.001, INFINITY), &mut rec) {
-            let mut scattered = Ray::default();
-            let mut attenuation = Color::default();
-            if rec
-                .mat
-                .as_ref()
-                .is_some_and(|mat| mat.scatter(ray, &rec, &mut attenuation, &mut scattered))
-            {
-                return attenuation * Self::ray_color(&scattered, depth - 1, world);
-            }
-            return Color::new(0.0, 0.0, 0.0);
+        if !world.hit(ray, Interval::new(0.001, INFINITY), &mut rec) {
+            return self.background;
         }
 
-        let unit_dir = ray.dir.unit_vector();
-        let a = 0.5 * (unit_dir.y + 1.0);
+        if let Some(mat) = &rec.mat {
+            let mut scattered = Ray::default();
+            let mut attenuation = Color::default();
+            let color_from_emission = mat.emitted(rec.u, rec.v, rec.p);
 
-        (Color::new(1.0, 1.0, 1.0) * (1.0 - a)) + (Color::new(0.5, 0.7, 1.0) * a)
+            if !mat.scatter(ray, &rec, &mut attenuation, &mut scattered) {
+                return color_from_emission;
+            }
+
+            let color_from_scatter = attenuation * self.ray_color(&scattered, depth - 1, world);
+
+            return color_from_emission + color_from_scatter;
+        }
+
+        return Color::default();
     }
 
     fn write_color(&mut self, color: &Color) {
