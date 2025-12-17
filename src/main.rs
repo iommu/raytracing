@@ -133,7 +133,7 @@ fn final_scene(image_width: i32, samples_per_pixel: i32, max_depth: i32) -> io::
     let mut boxes_2 = HittableList::default();
     let white = Rc::new(Lambertian::from_color(Color::new(0.73, 0.73, 0.73)));
     let ns = 1000;
-    for j in 0..ns {
+    for _ in 0..ns {
         boxes_2.add(Rc::new(Sphere::new_stationary(
             Point3::random_from_range(0.0, 165.0),
             10.0,

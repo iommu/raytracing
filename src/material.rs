@@ -5,7 +5,7 @@ use derive_new::new as New;
 use crate::{
     hittable::HitRecord,
     ray::Ray,
-    texture::{self, SolidColor, Texture},
+    texture::{SolidColor, Texture},
     utils::random_double,
     vec3::{Color, Point3, Vec3},
 };
@@ -21,7 +21,7 @@ pub trait Material {
         return false;
     }
 
-    fn emitted(&self, u : f64, v : f64, point : Point3) -> Color {
+    fn emitted(&self, _u : f64, _v : f64, _point : Point3) -> Color {
         return Color::new(0.0, 0.0, 0.0);
     }
 }
