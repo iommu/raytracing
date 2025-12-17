@@ -44,3 +44,6 @@ Notes : completion of tutorial, first attempt
 
 bcdd4bdcabc0cb8c99bdcb95715b79b2b5a36c1d : 15.612361624s, 15.644525864s
 Notes : implmented Copy trait and turned Vec3 opterations &Vec3 to Vec3. Speed difference negledgeable, but code readability improved 
+
+Notes :
+* Changed lot of if x > y { x = y} to using .min and .max in AABB, ~8.33% of runtime to ~7.4%

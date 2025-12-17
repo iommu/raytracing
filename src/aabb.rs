@@ -1,6 +1,10 @@
 use std::ops::{self, Index};
 
-use crate::{interval::Interval, ray::Ray, vec3::{Point3, Vec3}};
+use crate::{
+    interval::Interval,
+    ray::Ray,
+    vec3::{Point3, Vec3},
+};
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct AABB {
@@ -78,19 +82,11 @@ impl AABB {
             let t1 = (ax.max - ray_origin[axis]) * adinv;
 
             if t0 < t1 {
-                if t0 > ray_t.min {
-                    ray_t.min = t0;
-                }
-                if t1 < ray_t.max {
-                    ray_t.max = t1;
-                }
+                ray_t.min = ray_t.min.max(t0);
+                ray_t.max = ray_t.min.min(t1);
             } else {
-                if t1 > ray_t.min {
-                    ray_t.min = t1;
-                }
-                if t0 < ray_t.max {
-                    ray_t.max = t0;
-                }
+                ray_t.min = ray_t.min.max(t1);
+                ray_t.max = ray_t.max.min(t0);
             }
 
             if ray_t.max <= ray_t.min {
@@ -151,10 +147,6 @@ impl Index<usize> for AABB {
 impl ops::Add<Vec3> for AABB {
     type Output = AABB;
     fn add(self, offset: Vec3) -> AABB {
-        AABB::new(
-            self.x + offset.x, 
-            self.y + offset.y,
-            self.z + offset.z,
-        )
+        AABB::new(self.x + offset.x, self.y + offset.y, self.z + offset.z)
     }
 }
