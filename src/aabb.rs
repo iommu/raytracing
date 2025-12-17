@@ -1,6 +1,6 @@
-use std::ops::Index;
+use std::ops::{self, Index};
 
-use crate::{interval::Interval, ray::Ray, vec3::Point3};
+use crate::{interval::Interval, ray::Ray, vec3::{Point3, Vec3}};
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct AABB {
@@ -145,5 +145,16 @@ impl Index<usize> for AABB {
             1 => &self.y,
             _ => &self.z,
         }
+    }
+}
+
+impl ops::Add<Vec3> for AABB {
+    type Output = AABB;
+    fn add(self, offset: Vec3) -> AABB {
+        AABB::new(
+            self.x + offset.x, 
+            self.y + offset.y,
+            self.z + offset.z,
+        )
     }
 }

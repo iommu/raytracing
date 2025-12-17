@@ -28,10 +28,102 @@ use sphere::Sphere;
 use utils::{random_double, random_double_range};
 use vec3::{Color, Point3, Vec3};
 
+use crate::hittable::{RotateY, Translate};
 use crate::material::DiffuseLight;
-use crate::quad::Quad;
+use crate::quad::{Quad, box_new};
 use crate::texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
 use crate::tri::Tri;
+
+fn cornell_box() -> io::Result<()> {
+    let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
+    let mut world = HittableList::default();
+
+    // Materials
+    let red = Rc::new(Lambertian::from_color(Color::new(0.65, 0.05, 0.05))) as Rc<dyn Material>;
+    let white = Rc::new(Lambertian::from_color(Color::new(0.73, 0.73, 0.73))) as Rc<dyn Material>;
+    let green = Rc::new(Lambertian::from_color(Color::new(0.12, 0.45, 0.15))) as Rc<dyn Material>;
+    let light = Rc::new(DiffuseLight::from_color(Color::new(15.0, 15.0, 15.0))) as Rc<dyn Material>;
+
+    // Objects
+    world.add(Rc::new(Quad::new(
+        Point3::new(555.0, 0.0, 0.0),
+        Vec3::new(0.0, 555.0, 0.0),
+        Vec3::new(0.0, 0.0, 555.0),
+        green,
+    )));
+
+    world.add(Rc::new(Quad::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Vec3::new(0.0, 555.0, 0.0),
+        Vec3::new(0.0, 0.0, 555.0),
+        red,
+    )));
+
+    world.add(Rc::new(Quad::new(
+        Point3::new(343.0, 554.0, 332.0),
+        Vec3::new(-130.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, -105.0),
+        light,
+    )));
+
+    world.add(Rc::new(Quad::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Vec3::new(555.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, 555.0),
+        white.clone(),
+    )));
+
+    world.add(Rc::new(Quad::new(
+        Point3::new(555.0, 555.0, 555.0),
+        Vec3::new(-555.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, -555.0),
+        white.clone(),
+    )));
+
+    world.add(Rc::new(Quad::new(
+        Point3::new(0.0, 0.0, 555.0),
+        Vec3::new(555.0, 0.0, 0.0),
+        Vec3::new(0.0, 555.0, 0.0),
+        white.clone(),
+    )));
+
+    let box_1 = box_new(
+        Point3::new(0.0, 0.0, 0.0),
+        Vec3::new(165.0, 330.0, 295.0),
+        white.clone(),
+    );
+    let box_1 = Rc::new(RotateY::new(box_1, 15.0));
+    let box_1 = Rc::new(Translate::new(box_1, Vec3::new(265.0, 0.0, 295.0)));
+    world.add(box_1);
+
+    let box_2 = box_new(
+        Point3::new(0.0, 0.0, 0.0),
+        Vec3::new(165.0, 165.0, 165.0),
+        white.clone(),
+    );
+    let box_2 = Rc::new(RotateY::new(box_2, -18.0));
+    let box_2 = Rc::new(Translate::new(box_2, Vec3::new(130.0, 0.0, 65.0)));
+    world.add(box_2);
+
+    let mut camera = Camera::from_exporter(exporter);
+    camera.aspect_ratio = 1.0;
+    camera.image_width = 600;
+    camera.samples_per_pixel = 20;
+    camera.max_depth = 20;
+    camera.background = Color::new(0.0, 0.0, 0.00);
+
+    camera.vfov = 40.0;
+    camera.lookfrom = Point3::new(278.0, 278.0, -800.0);
+    camera.lookat = Point3::new(278.0, 278.0, 0.0);
+    camera.vup = Vec3::new(0.0, 1.0, 0.0);
+
+    camera.defocus_angle = 0.0;
+
+    // Render
+    camera.render(&world);
+
+    Ok(())
+}
 
 fn simple_lights() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
@@ -39,15 +131,16 @@ fn simple_lights() -> io::Result<()> {
 
     // Materials
     let pertext = Rc::new(Lambertian::new(Rc::new(NoiseTexture::new(4.0)))) as Rc<dyn Material>;
-    let difflight = Rc::new(DiffuseLight::from_color(Color::new(4.0, 4.0, 4.0))) as Rc<dyn Material>;
+    let difflight =
+        Rc::new(DiffuseLight::from_color(Color::new(4.0, 4.0, 4.0))) as Rc<dyn Material>;
 
     // Objects
-    world.add(Rc::new(Sphere::new_stationary (
+    world.add(Rc::new(Sphere::new_stationary(
         Point3::new(0.0, -1000.0, 0.0),
         1000.0,
         pertext.clone(),
     )));
-    world.add(Rc::new(Sphere::new_stationary (
+    world.add(Rc::new(Sphere::new_stationary(
         Point3::new(0.0, 2.0, 0.0),
         2.0,
         pertext,
@@ -60,15 +153,14 @@ fn simple_lights() -> io::Result<()> {
         Vec3::new(0.0, 2.0, 0.0),
         difflight.clone(),
     )));
-    world.add(Rc::new(Sphere::new_stationary (
+    world.add(Rc::new(Sphere::new_stationary(
         Point3::new(0.0, 7.0, 0.0),
         2.0,
         difflight,
     )));
 
-
     let mut camera = Camera::from_exporter(exporter);
-    camera.aspect_ratio = 16.0/9.0;
+    camera.aspect_ratio = 16.0 / 9.0;
     camera.image_width = 800;
     camera.samples_per_pixel = 100;
     camera.max_depth = 10;
@@ -316,7 +408,8 @@ fn bouncing() -> io::Result<()> {
 }
 
 fn main() -> io::Result<()> {
-    simple_lights()
+    cornell_box()
+    // simple_lights()
     // quads()
     // perlin_spheres()
     // earth()

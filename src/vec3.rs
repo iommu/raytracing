@@ -1,4 +1,4 @@
-use std::ops::{self, Index};
+use std::ops::{self, Index, IndexMut};
 
 use derive_new::new as New;
 
@@ -216,6 +216,17 @@ impl ops::Neg for Vec3 {
     }
 }
 
+impl IndexMut<usize> for Vec3 {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        assert!(index < 3, "Index out of bounds!");
+        match index {
+            0 => &mut self.x,
+            1 => &mut self.y,
+            _ => &mut self.z,
+        }
+    }
+}
+
 impl Index<usize> for Vec3 {
     type Output = f64;
     fn index(&self, index: usize) -> &Self::Output {
@@ -227,6 +238,7 @@ impl Index<usize> for Vec3 {
         }
     }
 }
+
 
 // Aliases
 pub type Color = Vec3;

@@ -1,4 +1,4 @@
-use std::f64::INFINITY;
+use std::{f64::INFINITY, ops};
 
 use derive_new::new as New;
 
@@ -72,5 +72,15 @@ impl Interval {
 impl Default for Interval {
     fn default() -> Self {
         Self::empty()
+    }
+}
+
+impl ops::Add<f64> for Interval {
+    type Output = Interval;
+    fn add(self, displacement: f64) -> Interval {
+        Interval::new(
+            self.min + displacement,
+            self.max + displacement,
+        )
     }
 }
