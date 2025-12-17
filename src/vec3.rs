@@ -239,7 +239,6 @@ impl Index<usize> for Vec3 {
     }
 }
 
-
 // Aliases
 pub type Color = Vec3;
 pub type Point3 = Vec3;
