@@ -1,3 +1,4 @@
+
 use std::rc::Rc;
 
 use crate::{
@@ -9,7 +10,7 @@ use crate::{
     vec3::{Point3, Vec3},
 };
 
-pub struct Quad {
+pub struct Tri {
     q: Point3,
     u: Vec3,
     v: Vec3,
@@ -20,7 +21,7 @@ pub struct Quad {
     d: f64,
 }
 
-impl Quad {
+impl Tri {
     #[allow(dead_code)]
     pub fn new(q: Point3, u: Vec3, v: Vec3, mat: Rc<dyn Material>) -> Self {
         let n = u.cross(v);
@@ -55,13 +56,17 @@ impl Quad {
             return false;
         }
 
+        if a + b > 1.0 {
+            return false;
+        }
+
         rec.u = a;
         rec.v = b;
         return true;
     }
 }
 
-impl Hittable for Quad {
+impl Hittable for Tri {
     fn hit(
         &self,
         ray: &ray::Ray,

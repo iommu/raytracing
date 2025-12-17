@@ -14,6 +14,7 @@ mod sphere;
 mod texture;
 mod utils;
 mod vec3;
+mod tri;
 
 use std::time::Instant;
 use std::{io, rc::Rc};
@@ -27,8 +28,9 @@ use sphere::Sphere;
 use utils::{random_double, random_double_range};
 use vec3::{Color, Point3, Vec3};
 
-use crate::quad::Quad;
+use crate::quad::{Quad};
 use crate::texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
+use crate::tri::Tri;
 
 fn quads() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
