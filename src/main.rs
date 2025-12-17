@@ -7,6 +7,7 @@ mod hittable;
 mod interval;
 mod material;
 mod perlin;
+mod quad;
 mod ray;
 mod rtw_image;
 mod sphere;
@@ -26,7 +27,73 @@ use sphere::Sphere;
 use utils::{random_double, random_double_range};
 use vec3::{Color, Point3, Vec3};
 
+use crate::quad::Quad;
 use crate::texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
+
+fn quads() -> io::Result<()> {
+    let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
+    let mut world = HittableList::default();
+
+    // Materials
+    let left_red = Rc::new(Lambertian::from_color(Color::new(1.0, 0.2, 0.2)));
+    let back_green = Rc::new(Lambertian::from_color(Color::new(0.2, 1.0, 0.2)));
+    let right_blue = Rc::new(Lambertian::from_color(Color::new(0.2, 0.2, 1.0)));
+    let upper_orange = Rc::new(Lambertian::from_color(Color::new(1.0, 0.5, 0.0)));
+    let lower_teal = Rc::new(Lambertian::from_color(Color::new(0.2, 0.8, 0.8)));
+
+    // Quads
+    world.add(Rc::new(Quad::new(
+        Point3::new(-3.0, -2.0, 5.0),
+        Vec3::new(0.0, 0.0, -4.0),
+        Vec3::new(0.0, 4.0, 0.0),
+        left_red,
+    )));
+    world.add(Rc::new(Quad::new(
+        Point3::new(-2.0, -2.0, 0.0),
+        Vec3::new(4.0, 0.0, 0.0),
+        Vec3::new(0.0, 4.0, 0.0),
+        back_green,
+    )));
+
+    world.add(Rc::new(Quad::new(
+        Point3::new(3.0, -2.0, 1.0),
+        Vec3::new(0.0, 0.0, 4.0),
+        Vec3::new(0.0, 4.0, 0.0),
+        right_blue,
+    )));
+
+    world.add(Rc::new(Quad::new(
+        Point3::new(-2.0, 3.0, 1.0),
+        Vec3::new(4.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, 4.0),
+        upper_orange,
+    )));
+
+    world.add(Rc::new(Quad::new(
+        Point3::new(-2.0, -3.0, 5.0),
+        Vec3::new(4.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, -4.0),
+        lower_teal,
+    )));
+
+    let mut camera = Camera::from_exporter(exporter);
+    camera.aspect_ratio = 1.0;
+    camera.image_width = 400;
+    camera.samples_per_pixel = 10;
+    camera.max_depth = 10;
+
+    camera.vfov = 80.0;
+    camera.lookfrom = Point3::new(0.0, 0.0, 9.0);
+    camera.lookat = Point3::new(0.0, 0.0, 0.0);
+    camera.vup = Vec3::new(0.0, 1.0, 0.0);
+
+    camera.defocus_angle = 0.0;
+
+    // Render
+    camera.render(&world);
+
+    Ok(())
+}
 
 fn perlin_spheres() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
@@ -191,6 +258,7 @@ fn bouncing() -> io::Result<()> {
 }
 
 fn main() -> io::Result<()> {
-    perlin_spheres()
+    quads()
+    // perlin_spheres()
     // earth()
 }

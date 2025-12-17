@@ -1,10 +1,8 @@
 use std::ops::Index;
 
-use derive_new::new as New;
-
 use crate::{interval::Interval, ray::Ray, vec3::Point3};
 
-#[derive(Debug, Clone, Copy, Default, New)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct AABB {
     pub x: Interval,
     pub y: Interval,
@@ -12,6 +10,13 @@ pub struct AABB {
 }
 
 impl AABB {
+    #[allow(dead_code)]
+    pub fn new(x: Interval, y: Interval, z: Interval) -> Self {
+        let mut obj = Self { x, y, z };
+        obj.pad_to_minimums();
+        obj
+    }
+
     #[allow(dead_code)]
     pub fn empty() -> AABB {
         AABB {
@@ -53,11 +58,11 @@ impl AABB {
 
     #[allow(dead_code)]
     pub fn from_aabbs(box_0: AABB, box_1: AABB) -> Self {
-        Self {
-            x: Interval::from_intervals(box_0.x, box_1.x),
-            y: Interval::from_intervals(box_0.y, box_1.y),
-            z: Interval::from_intervals(box_0.z, box_1.z),
-        }
+        Self::new(
+            Interval::from_intervals(box_0.x, box_1.x),
+            Interval::from_intervals(box_0.y, box_1.y),
+            Interval::from_intervals(box_0.z, box_1.z),
+        )
     }
 
     #[allow(dead_code)]
@@ -111,6 +116,22 @@ impl AABB {
             } else {
                 return 2;
             }
+        }
+    }
+
+    #[allow(dead_code)]
+    fn pad_to_minimums(&mut self) {
+        // Adjust the AABB so that no side is narrower than some delta, padding if necessary
+
+        let delta = 0.0;
+        if self.x.size() < delta {
+            self.x = self.x.expand(delta);
+        }
+        if self.y.size() < delta {
+            self.y = self.y.expand(delta);
+        }
+        if self.z.size() < delta {
+            self.z = self.z.expand(delta);
         }
     }
 }
