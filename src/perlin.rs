@@ -39,13 +39,13 @@ impl Perlin {
 
     #[allow(dead_code)]
     pub fn noise(&self, point: Point3) -> f64 {
-        let u = point.x - point.x.floor();
-        let v = point.y - point.y.floor();
-        let w = point.z - point.z.floor();
+        let u = point.x() - point.x().floor();
+        let v = point.y() - point.y().floor();
+        let w = point.z() - point.z().floor();
 
-        let i = point.x.floor() as i32 as usize;
-        let j = point.y.floor() as i32 as usize;
-        let k = point.z.floor() as i32 as usize;
+        let i = point.x().floor() as i32 as usize;
+        let j = point.y().floor() as i32 as usize;
+        let k = point.z().floor() as i32 as usize;
         let mut c = [[[Vec3::default(); 2]; 2]; 2];
 
         for di in 0..2 {
@@ -108,7 +108,7 @@ impl Perlin {
                     let j = dj as f64;
                     let k = dk as f64;
                     let weight_v = Vec3::new(u - i, v - j, w - k);
-                    accum += c[di][dj][dk].dot(weight_v)
+                    accum += c[di][dj][dk].dot(&weight_v)
                         * (i * uu + (1.0 - i) * (1.0 - uu))
                         * (j * vv + (1.0 - j) * (1.0 - vv))
                         * (k * ww + (1.0 - k) * (1.0 - ww));

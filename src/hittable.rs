@@ -28,7 +28,7 @@ impl HitRecord {
         // Sets the hit record normal vector
         // NOTE: the parameter `outward_normal` is assumed to have unit length
 
-        self.front_face = Vec3::dot(&ray.dir, outward_normal) < 0.0;
+        self.front_face = Vec3::dot(&ray.dir, &outward_normal) < 0.0;
         self.normal = if self.front_face {
             outward_normal
         } else {
@@ -109,7 +109,7 @@ impl Translate {
 impl Hittable for Translate {
     fn hit(&self, ray: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         // Move the ray backwards by the offset
-        let offset_r = Ray::new(ray.origin - self.offset, ray.dir, ray.time);
+        let offset_r = Ray::new(ray.origin - &self.offset, ray.dir, ray.time);
 
         // Determine whether an intersection exists along the offset ray (and if so, where)
         if !self.object.hit(&offset_r, ray_t, rec) {
@@ -117,7 +117,7 @@ impl Hittable for Translate {
         }
 
         // Move the intersection point forwards by the offset
-        rec.p += self.offset;
+        rec.p += &self.offset;
 
         return true;
     }
@@ -180,15 +180,15 @@ impl Hittable for RotateY {
         let sin_theta = self.sin_theta;
         // Transform the ray from world space to object space.
         let origin = Point3::new(
-            (cos_theta * ray.origin.x) - (sin_theta * ray.origin.z),
-            ray.origin.y,
-            (sin_theta * ray.origin.x) + (cos_theta * ray.origin.z),
+            (cos_theta * ray.origin.x()) - (sin_theta * ray.origin.z()),
+            ray.origin.y(),
+            (sin_theta * ray.origin.x()) + (cos_theta * ray.origin.z()),
         );
 
         let dir = Vec3::new(
-            (cos_theta * ray.dir.x) - (sin_theta * ray.dir.z),
-            ray.dir.y,
-            (sin_theta * ray.dir.x) + (cos_theta * ray.dir.z),
+            (cos_theta * ray.dir.x()) - (sin_theta * ray.dir.z()),
+            ray.dir.y(),
+            (sin_theta * ray.dir.x()) + (cos_theta * ray.dir.z()),
         );
 
         let rotated_r = Ray::new(origin, dir, ray.time);
@@ -200,15 +200,15 @@ impl Hittable for RotateY {
 
         // Transform the intersection from object space back to world space
         rec.p = Point3::new(
-            (cos_theta * rec.p.x) + (sin_theta * rec.p.z),
-            rec.p.y,
-            (-sin_theta * rec.p.x) + (cos_theta * rec.p.z),
+            (cos_theta * rec.p.x()) + (sin_theta * rec.p.z()),
+            rec.p.y(),
+            (-sin_theta * rec.p.x()) + (cos_theta * rec.p.z()),
         );
 
         rec.normal = Vec3::new(
-            (cos_theta * rec.normal.x) + (sin_theta * rec.normal.z),
-            rec.normal.y,
-            (-sin_theta * rec.normal.x) + (cos_theta * rec.normal.z),
+            (cos_theta * rec.normal.x()) + (sin_theta * rec.normal.z()),
+            rec.normal.y(),
+            (-sin_theta * rec.normal.x()) + (cos_theta * rec.normal.z()),
         );
 
         return true;
