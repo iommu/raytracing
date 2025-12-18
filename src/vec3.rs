@@ -1,4 +1,4 @@
-use std::ops;
+use std::ops::{self, Index, IndexMut};
 
 use derive_new::new as New;
 
@@ -6,9 +6,9 @@ use crate::utils::{random_double, random_double_range};
 
 #[derive(Debug, Clone, Copy, New, Default)]
 pub struct Vec3 {
-    x: f64,
-    y: f64,
-    z: f64,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl Vec3 {
@@ -76,21 +76,6 @@ impl Vec3 {
         let ray_out_perp = (*self + (n * cos_theta)) * etai_over_etat;
         let ray_out_para = n * ((1.0 - ray_out_perp.len_squared()).abs().sqrt() * -1.0);
         ray_out_perp + ray_out_para
-    }
-
-    #[allow(dead_code)]
-    pub fn x(&self) -> f64 {
-        self.x
-    }
-
-    #[allow(dead_code)]
-    pub fn y(&self) -> f64 {
-        self.y
-    }
-
-    #[allow(dead_code)]
-    pub fn z(&self) -> f64 {
-        self.z
     }
 
     #[allow(dead_code)]
@@ -227,6 +212,29 @@ impl ops::Neg for Vec3 {
             x: -self.x,
             y: -self.y,
             z: -self.z,
+        }
+    }
+}
+
+impl IndexMut<usize> for Vec3 {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        assert!(index < 3, "Index out of bounds!");
+        match index {
+            0 => &mut self.x,
+            1 => &mut self.y,
+            _ => &mut self.z,
+        }
+    }
+}
+
+impl Index<usize> for Vec3 {
+    type Output = f64;
+    fn index(&self, index: usize) -> &Self::Output {
+        assert!(index < 3, "Index out of bounds!"); // Bounds check
+        match index {
+            0 => &self.x,
+            1 => &self.y,
+            _ => &self.z,
         }
     }
 }

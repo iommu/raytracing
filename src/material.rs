@@ -1,15 +1,16 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, rc::Rc};
 
 use derive_new::new as New;
 
 use crate::{
     hittable::HitRecord,
     ray::Ray,
+    texture::{SolidColor, Texture},
     utils::random_double,
-    vec3::{Color, Vec3},
+    vec3::{Color, Point3, Vec3},
 };
 
-pub trait Material: Debug {
+pub trait Material {
     fn scatter(
         &self,
         _ray_in: &Ray,
@@ -19,26 +20,35 @@ pub trait Material: Debug {
     ) -> bool {
         return false;
     }
+
+    fn emitted(&self, _u : f64, _v : f64, _point : Point3) -> Color {
+        return Color::new(0.0, 0.0, 0.0);
+    }
 }
 
-#[derive(Debug, Clone, Copy, New, Default)]
+#[derive(Clone, New)]
 pub struct Lambertian {
-    pub albedo: Color,
+    pub texture: Rc<dyn Texture>,
 }
 
-impl Lambertian {}
+impl Lambertian {
+    #[allow(dead_code)]
+    pub fn from_color(albedo: Color) -> Self {
+        Self::new(Rc::new(SolidColor::new(albedo)))
+    }
+}
 
 impl Material for Lambertian {
     fn scatter(
         &self,
-        _ray_in: &Ray,
+        ray_in: &Ray,
         rec: &HitRecord,
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
         let scatter_direction = rec.normal + Vec3::random_unit_vector();
-        *scattered = Ray::new(rec.p, scatter_direction);
-        *attenuation = self.albedo.clone();
+        *scattered = Ray::new(rec.p, scatter_direction, ray_in.time);
+        *attenuation = self.texture.value(rec.u, rec.v, rec.p);
         return true;
     }
 }
@@ -50,12 +60,11 @@ pub struct Metal {
 }
 
 impl Metal {
+    #[allow(dead_code)]
     pub fn new(albedo: Color, fuzz: f64) -> Metal {
-        let fuzz = if fuzz < 1.0 { fuzz } else { 1.0 };
-
         Metal {
             albedo: albedo,
-            fuzz: fuzz,
+            fuzz: fuzz.min(1.0),
         }
     }
 }
@@ -68,11 +77,11 @@ impl Material for Metal {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        let reflected = Vec3::reflect(ray_in.direction(), rec.normal).unit_vector()
+        let reflected = Vec3::reflect(&ray_in.dir, rec.normal).unit_vector()
             + (Vec3::random_unit_vector() * self.fuzz);
-        *scattered = Ray::new(rec.p, reflected);
-        *attenuation = self.albedo.clone();
-        return Vec3::dot(scattered.direction(), rec.normal) > 0.0;
+        *scattered = Ray::new(rec.p, reflected, ray_in.time);
+        *attenuation = self.albedo;
+        return Vec3::dot(&scattered.dir, rec.normal) > 0.0;
     }
 }
 
@@ -84,12 +93,14 @@ pub struct Dielectric {
 }
 
 impl Dielectric {
+    #[allow(dead_code)]
     pub fn new(refraction_index: f64) -> Dielectric {
         Dielectric {
             refraction_index: refraction_index,
         }
     }
 
+    #[allow(dead_code)]
     fn reflectance(cosin: f64, refraction_index: f64) -> f64 {
         // Use Schlick's approximation for reflectance.
         let r0 = ((1.0 - refraction_index) / (1.0 + refraction_index)).powi(2);
@@ -112,7 +123,7 @@ impl Material for Dielectric {
             self.refraction_index
         };
 
-        let unit_direction = ray_in.direction().unit_vector();
+        let unit_direction = ray_in.dir.unit_vector();
         let cos_theta = -unit_direction.dot(rec.normal).min(1.0);
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
@@ -123,7 +134,51 @@ impl Material for Dielectric {
             unit_direction.refract(rec.normal, ri)
         };
 
-        *scattered = Ray::new(rec.p, direction);
+        *scattered = Ray::new(rec.p, direction, ray_in.time);
+        return true;
+    }
+}
+
+#[derive(Clone, New)]
+pub struct DiffuseLight {
+    pub texture: Rc<dyn Texture>,
+}
+
+impl DiffuseLight {
+    #[allow(dead_code)]
+    pub fn from_color(albedo: Color) -> Self {
+        Self::new(Rc::new(SolidColor::new(albedo)))
+    }
+}
+
+impl Material for DiffuseLight {
+    fn emitted(&self, u : f64, v : f64, point : Point3) -> Color {
+        self.texture.value(u, v, point)
+    }
+}
+
+#[derive(Clone, New)]
+pub struct Isotropic {
+    pub texture: Rc<dyn Texture>, 
+}
+
+impl Isotropic {
+    #[allow(dead_code)]
+    pub fn from_color(albedo: Color) -> Self {
+        Self::new(Rc::new(SolidColor::new(albedo)))
+    }
+}
+
+impl Material for Isotropic {
+    fn scatter(
+            &self,
+            ray_in: &Ray,
+            rec: &HitRecord,
+            attenuation: &mut Color,
+            scattered: &mut Ray,
+        ) -> bool {
+        *scattered = Ray::new(rec.p, Vec3::random_unit_vector(), ray_in.time);
+        *attenuation = self.texture.value(rec.u, rec.v, rec.p);
         return true;
     }
 }

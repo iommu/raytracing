@@ -25,7 +25,7 @@ Like in the origin tutorial this operates by using shell pipes to write the `std
 This project was developed on Linux and while it should compile on Windows and Mac OS, it's untested and I don't know how you'd pipe the data in a traditional Windows shell. 
 
 ```Bash
-cargo run -r > image.ppm
+cargo run -r
 ```
 
 ## Profiling 
@@ -43,3 +43,6 @@ Notes : completion of tutorial, first attempt
 
 [bcdd4bd](/../../commit/bcdd4bd) : 15.612361624s, 15.644525864s  
 Notes : implmented Copy trait and turned Vec3 opterations &Vec3 to Vec3. Speed difference negledgeable, but code readability improved 
+
+Notes :
+* Changed lot of if x > y { x = y} to using .min and .max in AABB, ~8.33% of runtime to ~7.4%

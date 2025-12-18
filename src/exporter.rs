@@ -54,9 +54,9 @@ impl Exporter for PPMExporter {
 
         // Translate the [0,1] component values to the byte range [0,255]
         let intensity = Interval::new(0.0, 0.999);
-        let ir = (255.999 * intensity.clamp(color.x())) as i64;
-        let ig = (255.999 * intensity.clamp(color.y())) as i64;
-        let ib = (255.999 * intensity.clamp(color.z())) as i64;
+        let ir = (255.999 * intensity.clamp(color.x)) as i64;
+        let ig = (255.999 * intensity.clamp(color.y)) as i64;
+        let ib = (255.999 * intensity.clamp(color.z)) as i64;
 
         // Write out the pixel color components
         file.write_fmt(format_args!("{ir} {ig} {ib}\n"))?;
@@ -126,14 +126,14 @@ impl Exporter for BMPExporter {
 
         // Translate the [0,1] component values to the byte range [0,255]
         let intensity = Interval::new(0.0, 0.999);
-        let r = (255.999 * intensity.clamp(color.x())) as u8;
-        let g = (255.999 * intensity.clamp(color.y())) as u8;
-        let b = (255.999 * intensity.clamp(color.z())) as u8;
+        let r = (255.999 * intensity.clamp(color.x)) as u8;
+        let g = (255.999 * intensity.clamp(color.y)) as u8;
+        let b = (255.999 * intensity.clamp(color.z)) as u8;
 
         // Write out the pixel color components
-        file.write_u8(r)?;
-        file.write_u8(g)?;
         file.write_u8(b)?;
+        file.write_u8(g)?;
+        file.write_u8(r)?;
 
         Ok(())
     }

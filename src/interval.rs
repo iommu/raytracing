@@ -1,6 +1,8 @@
-use std::f64::INFINITY;
+use std::{f64::INFINITY, ops};
 
-#[derive(Debug, Clone, Copy)]
+use derive_new::new as New;
+
+#[derive(Debug, Clone, Copy, New)]
 pub struct Interval {
     pub min: f64,
     pub max: f64,
@@ -24,13 +26,11 @@ impl Interval {
     }
 
     #[allow(dead_code)]
-    pub fn default() -> Interval {
-        Self::empty()
-    }
-
-    #[allow(dead_code)]
-    pub fn new(min: f64, max: f64) -> Interval {
-        Interval { min: min, max: max }
+    pub fn from_intervals(a: Interval, b: Interval) -> Interval {
+        Interval {
+            min: a.min.min(b.min),
+            max: a.max.max(b.max),
+        }
     }
 
     #[allow(dead_code)]
@@ -57,5 +57,30 @@ impl Interval {
         } else {
             x
         }
+    }
+
+    #[allow(dead_code)]
+    pub fn expand(&self, delta: f64) -> Interval {
+        let padding = delta / 2.0;
+        Interval {
+            min: self.min - padding,
+            max: self.max + padding,
+        }
+    }
+}
+
+impl Default for Interval {
+    fn default() -> Self {
+        Self::empty()
+    }
+}
+
+impl ops::Add<f64> for Interval {
+    type Output = Interval;
+    fn add(self, displacement: f64) -> Interval {
+        Interval::new(
+            self.min + displacement,
+            self.max + displacement,
+        )
     }
 }
