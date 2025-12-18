@@ -22,21 +22,19 @@ use std::{io, rc::Rc};
 
 use bvh::BVHNode;
 use camera::Camera;
+use constant_medium::ConstantMedium;
 use exporter::{BMPExporter, Exporter};
 use hittable::HittableList;
+use hittable::{RotateY, Translate};
+use material::DiffuseLight;
 use material::{Dielectric, Lambertian, Material, Metal};
+use quad::{Quad, box_new};
 use sphere::Sphere;
-use stb_image::image;
-use utils::{random_double, random_double_range};
+use texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
+use utils::random_double_range;
 use vec3::{Color, Point3, Vec3};
 
-use crate::constant_medium::ConstantMedium;
-use crate::hittable::{RotateY, Translate};
-use crate::material::DiffuseLight;
-use crate::quad::{Quad, box_new};
-use crate::texture::{CheckerTexture, ImageTexture, NoiseTexture, Texture};
-use crate::tri::Tri;
-
+#[allow(dead_code)]
 fn final_scene(image_width: i32, samples_per_pixel: i32, max_depth: i32) -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
 
@@ -165,6 +163,7 @@ fn final_scene(image_width: i32, samples_per_pixel: i32, max_depth: i32) -> io::
     Ok(())
 }
 
+#[allow(dead_code)]
 fn cornell_smoke() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
     let mut world = HittableList::default();
@@ -264,6 +263,7 @@ fn cornell_smoke() -> io::Result<()> {
     Ok(())
 }
 
+#[allow(dead_code)]
 fn cornell_box() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
     let mut world = HittableList::default();
@@ -355,6 +355,7 @@ fn cornell_box() -> io::Result<()> {
     Ok(())
 }
 
+#[allow(dead_code)]
 fn simple_lights() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
     let mut world = HittableList::default();
@@ -409,6 +410,7 @@ fn simple_lights() -> io::Result<()> {
     Ok(())
 }
 
+#[allow(dead_code)]
 fn quads() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
     let mut world = HittableList::default();
@@ -475,6 +477,7 @@ fn quads() -> io::Result<()> {
     Ok(())
 }
 
+#[allow(dead_code)]
 fn perlin_spheres() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
     let mut world = HittableList::default();
@@ -512,6 +515,7 @@ fn perlin_spheres() -> io::Result<()> {
     Ok(())
 }
 
+#[allow(dead_code)]
 fn earth() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
     let mut world = HittableList::default();
@@ -543,14 +547,15 @@ fn earth() -> io::Result<()> {
     Ok(())
 }
 
+#[allow(dead_code)]
 fn bouncing() -> io::Result<()> {
     let exporter: Box<dyn Exporter> = Box::new(BMPExporter::new("render.bmp")?);
 
     let mut world = HittableList::default();
 
     // World setup
-    let material_ground: Rc<dyn Material> =
-        Rc::new(Lambertian::from_color(Color::new(0.5, 0.5, 0.5)));
+    // let material_ground: Rc<dyn Material> =
+    //     Rc::new(Lambertian::from_color(Color::new(0.5, 0.5, 0.5)));
     let material_checker: Rc<dyn Material> = Rc::new(Lambertian::new(Rc::new(
         CheckerTexture::from_colors(0.32, Color::new(0.2, 0.3, 0.1), Color::new(0.9, 0.9, 0.9)),
     )));

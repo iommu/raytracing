@@ -11,6 +11,7 @@ pub struct ConstantMedium {
 }
 
 impl ConstantMedium {
+    #[allow(dead_code)]
     pub fn new(boundary: Rc<dyn Hittable>, density: f64, tex: Rc<dyn Texture>) -> ConstantMedium {
         ConstantMedium {
             boundary,
@@ -19,6 +20,7 @@ impl ConstantMedium {
         }
     }
 
+    #[allow(dead_code)]
     pub fn from_color(boundary: Rc<dyn Hittable>, density: f64, albedo: Color) -> ConstantMedium {
         ConstantMedium {
             boundary,

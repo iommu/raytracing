@@ -1,4 +1,4 @@
-use std::ops::{self, Deref, Index, IndexMut};
+use std::ops::{self, Index, IndexMut};
 
 use crate::utils::{random_double, random_double_range};
 
@@ -10,16 +10,19 @@ pub struct Vec3(na::Vector3<f64>);
 
 impl Vec3 {
     // generators
+    #[allow(dead_code)]
     #[inline]
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3(na::Vector3::new(x, y, z))
     }
 
+    #[allow(dead_code)]
     #[inline]
     pub fn random() -> Vec3 {
         Vec3::new(random_double(), random_double(), random_double())
     }
 
+    #[allow(dead_code)]
     #[inline]
     pub fn random_from_range(min: f64, max: f64) -> Vec3 {
         Vec3::new(
@@ -29,6 +32,7 @@ impl Vec3 {
         )
     }
 
+    #[allow(dead_code)]
     #[inline]
     pub fn random_unit_vector() -> Vec3 {
         loop {
@@ -43,26 +47,31 @@ impl Vec3 {
 
     // mapped primatives
 
+    #[allow(dead_code)]
     #[inline]
     pub fn x(&self) -> f64 {
         self.0[0]
     }
 
+    #[allow(dead_code)]
     #[inline]
     pub fn y(&self) -> f64 {
         self.0[1]
     }
 
+    #[allow(dead_code)]
     #[inline]
     pub fn z(&self) -> f64 {
         self.0[2]
     }
 
+    #[allow(dead_code)]
     #[inline]
     pub fn len(&self) -> f64 {
         self.0.magnitude()
     }
 
+    #[allow(dead_code)]
     #[inline]
     pub fn len_squared(&self) -> f64 {
         self.0.magnitude_squared()
@@ -70,26 +79,33 @@ impl Vec3 {
 
     // map generators
 
+    #[allow(dead_code)]
     #[inline]
     pub fn dot(&self, rhs: &Vec3) -> f64 {
         self.0.dot(&rhs.0)
     }
 
+    #[allow(dead_code)]
     #[inline]
     pub fn cross(&self, rhs: &Vec3) -> Vec3 {
         Vec3(self.0.cross(&rhs.0))
     }
 
+    // member funcs
+
+    #[allow(dead_code)]
     #[inline]
     pub fn unit_vector(&self) -> Vec3 {
         *self / self.len()
     }
 
+    #[allow(dead_code)]
     #[inline]
     pub fn reflect(&self, n: &Vec3) -> Vec3 {
         *self - &(*n * (self.dot(&n) * 2.0))
     }
 
+    #[allow(dead_code)]
     #[inline]
     pub fn refract(&self, n: &Vec3, etai_over_etat: f64) -> Vec3 {
         let cos_theta = f64::min((*self * -1.0).dot(n), 1.0);
@@ -98,6 +114,7 @@ impl Vec3 {
         ray_out_perp + &ray_out_para
     }
 
+    #[allow(dead_code)]
     #[inline]
     pub fn near_zero(&self) -> bool {
         // Return true if the vector is close to zero in all dimensions
@@ -105,6 +122,7 @@ impl Vec3 {
         return (self.x().abs() < thresh) && (self.y().abs() < thresh) && (self.z().abs() < thresh);
     }
 
+    #[allow(dead_code)]
     #[inline]
     pub fn random_on_hemisphere(&self) -> Vec3 {
         let on_unit_sphere = Self::random_unit_vector();
@@ -117,6 +135,7 @@ impl Vec3 {
 
     // static functions
 
+    #[allow(dead_code)]
     #[inline]
     pub fn random_in_unit_disk() -> Vec3 {
         loop {
