@@ -62,9 +62,9 @@ impl CheckerTexture {
 
 impl Texture for CheckerTexture {
     fn value(&self, u: f64, v: f64, point: Point3) -> Color {
-        let x_int = (self.inv_scale * point.x).floor() as i32;
-        let y_int = (self.inv_scale * point.y).floor() as i32;
-        let z_int = (self.inv_scale * point.z).floor() as i32;
+        let x_int = (self.inv_scale * point.x()).floor() as i32;
+        let y_int = (self.inv_scale * point.y()).floor() as i32;
+        let z_int = (self.inv_scale * point.z()).floor() as i32;
 
         let is_even = (x_int + y_int + z_int) % 2 == 0;
 
@@ -131,6 +131,6 @@ impl NoiseTexture {
 impl Texture for NoiseTexture {
     fn value(&self, _u: f64, _v: f64, point: Point3) -> Color {
         Color::new(0.5, 0.5, 0.5)
-            * (1.0 + (self.scale * point.z + 10.0 * self.noise.turb(point, 7)).sin())
+            * (1.0 + (self.scale * point.z() + 10.0 * self.noise.turb(point, 7)).sin())
     }
 }

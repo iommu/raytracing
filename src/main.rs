@@ -75,7 +75,7 @@ fn final_scene(image_width: i32, samples_per_pixel: i32, max_depth: i32) -> io::
     )));
 
     let center_1 = Point3::new(400.0, 400.0, 200.0);
-    let center_2 = center_1 + Vec3::new(30.0, 0.0, 0.0);
+    let center_2 = center_1 + &Vec3::new(30.0, 0.0, 0.0);
     let sphere_material = Rc::new(Lambertian::from_color(Color::new(0.7, 0.3, 0.1)));
     world.add(Rc::new(Sphere::new_moving(
         center_1,
@@ -638,9 +638,8 @@ fn bouncing() -> io::Result<()> {
 }
 
 fn main() -> io::Result<()> {
-    final_scene(800, 10000, 40)
-
-    // final_scene(400, 250, 4)
+    // final_scene(800, 10000, 40)
+    final_scene(400, 10, 4)
     // cornell_smoke()
     // cornell_box()
     // simple_lights()

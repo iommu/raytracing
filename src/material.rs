@@ -21,7 +21,7 @@ pub trait Material {
         return false;
     }
 
-    fn emitted(&self, _u : f64, _v : f64, _point : Point3) -> Color {
+    fn emitted(&self, _u: f64, _v: f64, _point: Point3) -> Color {
         return Color::new(0.0, 0.0, 0.0);
     }
 }
@@ -46,7 +46,7 @@ impl Material for Lambertian {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        let scatter_direction = rec.normal + Vec3::random_unit_vector();
+        let scatter_direction = rec.normal + &Vec3::random_unit_vector();
         *scattered = Ray::new(rec.p, scatter_direction, ray_in.time);
         *attenuation = self.texture.value(rec.u, rec.v, rec.p);
         return true;
@@ -77,11 +77,11 @@ impl Material for Metal {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        let reflected = Vec3::reflect(&ray_in.dir, rec.normal).unit_vector()
-            + (Vec3::random_unit_vector() * self.fuzz);
+        let reflected = Vec3::reflect(&ray_in.dir, &rec.normal).unit_vector()
+            + &(Vec3::random_unit_vector() * self.fuzz);
         *scattered = Ray::new(rec.p, reflected, ray_in.time);
         *attenuation = self.albedo;
-        return Vec3::dot(&scattered.dir, rec.normal) > 0.0;
+        return Vec3::dot(&scattered.dir, &rec.normal) > 0.0;
     }
 }
 
@@ -124,14 +124,14 @@ impl Material for Dielectric {
         };
 
         let unit_direction = ray_in.dir.unit_vector();
-        let cos_theta = -unit_direction.dot(rec.normal).min(1.0);
+        let cos_theta = -unit_direction.dot(&rec.normal).min(1.0);
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
         let cannot_refract = ri * sin_theta > 1.0;
         let direction = if cannot_refract || Self::reflectance(cos_theta, ri) > random_double() {
-            unit_direction.reflect(rec.normal)
+            unit_direction.reflect(&rec.normal)
         } else {
-            unit_direction.refract(rec.normal, ri)
+            unit_direction.refract(&rec.normal, ri)
         };
 
         *scattered = Ray::new(rec.p, direction, ray_in.time);
@@ -152,14 +152,14 @@ impl DiffuseLight {
 }
 
 impl Material for DiffuseLight {
-    fn emitted(&self, u : f64, v : f64, point : Point3) -> Color {
+    fn emitted(&self, u: f64, v: f64, point: Point3) -> Color {
         self.texture.value(u, v, point)
     }
 }
 
 #[derive(Clone, New)]
 pub struct Isotropic {
-    pub texture: Rc<dyn Texture>, 
+    pub texture: Rc<dyn Texture>,
 }
 
 impl Isotropic {
@@ -171,12 +171,12 @@ impl Isotropic {
 
 impl Material for Isotropic {
     fn scatter(
-            &self,
-            ray_in: &Ray,
-            rec: &HitRecord,
-            attenuation: &mut Color,
-            scattered: &mut Ray,
-        ) -> bool {
+        &self,
+        ray_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Color,
+        scattered: &mut Ray,
+    ) -> bool {
         *scattered = Ray::new(rec.p, Vec3::random_unit_vector(), ray_in.time);
         *attenuation = self.texture.value(rec.u, rec.v, rec.p);
         return true;

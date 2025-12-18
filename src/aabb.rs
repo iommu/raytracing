@@ -147,6 +147,10 @@ impl Index<usize> for AABB {
 impl ops::Add<Vec3> for AABB {
     type Output = AABB;
     fn add(self, offset: Vec3) -> AABB {
-        AABB::new(self.x + offset.x, self.y + offset.y, self.z + offset.z)
+        AABB::new(
+            self.x + offset.x(),
+            self.y + offset.y(),
+            self.z + offset.z(),
+        )
     }
 }

@@ -79,7 +79,7 @@ impl Camera {
                 let mut pixel_color = Color::default();
                 for _ in 0..self.samples_per_pixel {
                     let ray = self.get_ray(i, j);
-                    pixel_color += self.ray_color(&ray, self.max_depth, world);
+                    pixel_color += &self.ray_color(&ray, self.max_depth, world);
                 }
                 self.write_color(&(pixel_color * self.pixel_samples_scale));
             }
@@ -108,9 +108,9 @@ impl Camera {
         let viewport_width = viewport_height * (self.image_width as f64 / self.image_height as f64);
 
         // Calculate the u,v,w unit basis vectors for the camera coordinate frame
-        self.w = (self.lookfrom - self.lookat).unit_vector();
-        self.u = self.vup.cross(self.w).unit_vector();
-        self.v = self.w.cross(self.u);
+        self.w = (self.lookfrom - &self.lookat).unit_vector();
+        self.u = self.vup.cross(&self.w).unit_vector();
+        self.v = self.w.cross(&self.u);
 
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
         let viewport_u = self.u * viewport_width;
@@ -122,8 +122,9 @@ impl Camera {
 
         // Calculate the location of the upper left pixel.
         let viewport_upper_left =
-            self.center - (self.w * self.focus_dist) - (viewport_u / 2.0) - (viewport_v / 2.0);
-        self.pixel00_loc = viewport_upper_left + ((self.pixel_delta_u + self.pixel_delta_v) * 0.5);
+            self.center - &(self.w * self.focus_dist) - &(viewport_u / 2.0) - &(viewport_v / 2.0);
+        self.pixel00_loc =
+            viewport_upper_left + &((self.pixel_delta_u + &self.pixel_delta_v) * 0.5);
 
         // Calculate the camera defocus disk basis vectors
         let defocus_radius = self.focus_dist * degrees_to_radians(self.defocus_angle / 2.0).tan();
@@ -141,7 +142,7 @@ impl Camera {
     fn defocus_disk_sample(&self) -> Point3 {
         // Returns a random point in the camera defocus disk
         let p = Vec3::random_in_unit_disk();
-        self.center + ((self.defocus_disk_u * p.x) + (self.defocus_disk_v * p.y))
+        self.center + &((self.defocus_disk_u * p.x()) + &(self.defocus_disk_v * p.y()))
     }
 
     fn get_ray(&self, i: i32, j: i32) -> Ray {
@@ -150,18 +151,18 @@ impl Camera {
 
         let offset = Self::sample_square();
         let pixel_sample = self.pixel00_loc
-            + ((self.pixel_delta_u * (i as f64 + offset.x) as f64)
-                + (self.pixel_delta_v * (j as f64 + offset.y) as f64));
+            + &((self.pixel_delta_u * (i as f64 + offset.x()) as f64)
+                + &(self.pixel_delta_v * (j as f64 + offset.y()) as f64));
 
         let ray_origin = if self.defocus_angle <= 0.0 {
-            self.center
+            &self.center
         } else {
-            self.defocus_disk_sample()
+            &self.defocus_disk_sample()
         };
         let ray_direction = pixel_sample - ray_origin;
         let ray_time = random_double();
 
-        Ray::new(ray_origin, ray_direction, ray_time)
+        Ray::new(*ray_origin, ray_direction, ray_time)
     }
 
     fn ray_color<T: Hittable>(&self, ray: &Ray, depth: i32, world: &T) -> Color {
@@ -184,18 +185,18 @@ impl Camera {
                 return color_from_emission;
             }
 
-            let color_from_scatter = attenuation * self.ray_color(&scattered, depth - 1, world);
+            let color_from_scatter = attenuation * &self.ray_color(&scattered, depth - 1, world);
 
-            return color_from_emission + color_from_scatter;
+            return color_from_emission + &color_from_scatter;
         }
 
         return Color::default();
     }
 
     fn write_color(&mut self, color: &Color) {
-        let mut r = color.x;
-        let mut g = color.y;
-        let mut b = color.z;
+        let mut r = color.x();
+        let mut g = color.y();
+        let mut b = color.z();
 
         // Apply a linear to gamma transform for gamma 2
         r = linear_to_gamma(r);
